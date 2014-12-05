@@ -1,0 +1,132 @@
+{
+	"walls" : {
+		"size" : 128,
+		"num":20,
+		"rows":4,
+		"tiles" : {
+			"0" : {
+				"image" : "Walls\/Wall 1 NW.png"
+			},
+			"1" : {
+				"image" : "Walls\/Wall 2 NE.png"
+			},
+			"10" : {
+				"image" : "Walls\/Wall 3 NE.png"
+			},
+			"11" : {
+				"image" : "Walls\/Wall 3 NW.png"
+			},
+			"12" : {
+				"image" : "Walls\/Wall 3 SE.png"
+			},
+			"13" : {
+				"image" : "Walls\/Wall 3 SW.png"
+			},
+			"14" : {
+				"image" : "Walls\/Wall 4 NE.png"
+			},
+			"15" : {
+				"image" : "Walls\/Wall 4 NW.png"
+			},
+			"16" : {
+				"image" : "Walls\/Wall 4 SE.png"
+			},
+			"17" : {
+				"image" : "Walls\/Wall 4 SW.png"
+			},
+			"18" : {
+				"image" : "Walls\/Wall 5 SE.png"
+			},
+			"19" : {
+				"image" : "Walls\/Wall 5 SW.png"
+			},
+			"2" : {
+				"image" : "Walls\/Wall 2 NW.png"
+			},
+			"3" : {
+				"image" : "Walls\/Wall 1 NE.png"
+			},
+			"4" : {
+				"image" : "Walls\/Wall 5 NE.png"
+			},
+			"5" : {
+				"image" : "Walls\/Wall 1 SW.png"
+			},
+			"6" : {
+				"image" : "Walls\/Wall 2 SW.png"
+			},
+			"7" : {
+				"image" : "Walls\/Wall 2 SE.png"
+			},
+			"8" : {
+				"image" : "Walls\/Wall 1 SE.png"
+			},
+			"9" : {
+				"image" : "Walls\/Wall 5 NW.png"
+			}
+		}
+	},
+	"totemWalkways" : {
+		"size" : 128,
+		"num":8,
+		"rows":2,
+		"tiles" : {
+			"0" : {
+				"image" : "Totems\/Totem 1 N.png"
+			},
+			"1" : {
+				"image" : "Totems\/Totem 1 S.png"
+			},
+			"2" : {
+				"image" : "Totems\/Totem 2 N.png"
+			},
+			"3" : {
+				"image" : "Totems\/Totem 2 S.png"
+			},
+			"4" : {
+				"image" : "Walkways\/Walkway 1 E.png"
+			},
+			"5" : {
+				"image" : "Walkways\/Walkway 1 W.png"
+			},
+			"6" : {
+				"image" : "Walkways\/Walkway 2 E.png"
+			},
+			"7" : {
+				"image" : "Walkways\/Walkway 2 W.png"
+			}
+		}
+	},
+	"other" : {
+		"size" : 256,
+		"num":4,
+		"rows":1,
+		"tiles" : {
+			"0" : {
+				"image" : "Other\/Cat's Eyes.png"
+			},
+			"1" : {
+				"image" : "Other\/Flare.png"
+			},
+			"2" : {
+				"image" : "Other\/Grass.png"
+			},
+			"3" : {
+				"image" : "Other\/Roots.png"
+			}
+		},
+	},
+	"slopes" : {
+		"size" : 256,
+		"num":2,
+		"rows":1,
+		"tiles" : {
+			"0" : {
+				"image" : "Walls\/Wall Slope Down 256.png"
+			},
+			"1" : {
+				"image" : "Walls\/Wall Slope Up 256.png"
+			}
+		}
+	}
+}
