@@ -44,7 +44,6 @@ public class Ball extends Entity {
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
 		this.x += xSpeed;
 		this.y += ySpeed;
 
@@ -84,7 +83,6 @@ public class Ball extends Entity {
 
 	@Override
 	public void draw(Graphics2D g2d) {
-		// TODO Auto-generated method stub
 		ball.draw(g2d);
 
 		// g2d.setColor(Color.red);

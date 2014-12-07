@@ -1,9 +1,8 @@
 package rickelectric.game.chosen.level;
-import java.awt.BasicStroke;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,15 +15,15 @@ import rickelectric.game.chosen.KeyboardInputService;
 import rickelectric.game.chosen.entities.Bullet;
 import rickelectric.game.chosen.entities.BulletPool;
 import rickelectric.game.chosen.entities.CatEyes;
-import rickelectric.game.chosen.entities.Dragon;
+import rickelectric.game.chosen.entities.FireDragon;
 import rickelectric.game.chosen.entities.DualSprite;
 import rickelectric.game.chosen.entities.Key;
-import rickelectric.game.chosen.entities.Player;
 import rickelectric.game.chosen.entities.PlayerID;
 import rickelectric.game.chosen.entities.Portal;
 import rickelectric.game.chosen.level.tilemap.LevelMap;
 import rickelectric.game.chosen.level.tilemap.Tile;
 import rickelectric.game.chosen.screens.LevelScreen;
+import rickelectric.game.chosen.screens.LoadingScreen;
 
 public class LevelScreen_2 extends LevelScreen {
 
@@ -34,21 +33,16 @@ public class LevelScreen_2 extends LevelScreen {
 	private LevelMap map;
 	private Camera camera;
 
-	private Player player;
-
 	private String notifyText;
 	private long notifyTime;
 
 	private CatEyes portalOpen;
 	private Portal exitPortal;
 
-	private Dragon[] dragon;
+	private ArrayList<FireDragon> dragons;
 	private ArrayList<Key> keys;
 
 	private double scaler;
-
-	private int numKeys;
-	private int hp;
 
 	private long suspendTime, pauseDelay, keyDelay;
 
@@ -66,8 +60,6 @@ public class LevelScreen_2 extends LevelScreen {
 		this.levelName = "Dreamland: The Impossible Planet";
 
 		scaler = 0.8;
-		numKeys = 0;
-		hp = 200;
 
 		paused = false;
 		pauseDelay = notifyTime = System.currentTimeMillis();
@@ -76,54 +68,82 @@ public class LevelScreen_2 extends LevelScreen {
 
 	@Override
 	public void loadScreen() {
-		background = new BackgroundManager(GameSystem.getInstance(), 2);
+		LoadingScreen.getInstance().loading(GameSystem.LEVEL_2);
+		GameSystem.getInstance().changeScreen(GameSystem.LOADING_SCREEN);
 
-		super.loadScreen();
-		map = new LevelMap(mapName);
+		new Thread(new Runnable() {
+			public void run() {
 
-		camera = new Camera();
+				LoadingScreen.getInstance().setText("Loading Level 2...");
+				LoadingScreen.getInstance().setPercent(0);
+				background = new BackgroundManager(GameSystem.getInstance(), 2);
+				LoadingScreen.getInstance().setPercent(10);
+				LevelScreen_2.super.loadScreen();
 
-		keys = new ArrayList<Key>();
-		populateCoins();
+				LoadingScreen.getInstance().setText("Loading Level Map...");
+				map = new LevelMap(mapName);
+				LoadingScreen.getInstance().setPercent(25);
 
-		portalOpen = new CatEyes(2 * Globals.MAP.getMapData().tilewidth,
-				3 * Globals.MAP.getMapData().tileheight);
+				camera = new Camera();
 
-		exitPortal = new Portal(1 * Globals.MAP.getMapData().tilewidth,
-				19 * Globals.MAP.getMapData().tileheight + 20);
+				keys = new ArrayList<Key>();
+				populateCoins();
+				LoadingScreen.getInstance().setPercent(35);
 
-		Point p;
-		dragon = new Dragon[4];
-		p = Globals.MAP.getXYOf(3, 3);
-		dragon[0] = new Dragon(p.x, p.y);
-		dragon[0].bind(p.x, p.x + 1024);
+				portalOpen = new CatEyes(
+						2 * Globals.MAP.getMapData().tilewidth, 3 * Globals.MAP
+								.getMapData().tileheight);
 
-		p = Globals.MAP.getXYOf(24, 27);
-		dragon[1] = new Dragon(p.x, p.y);
-		dragon[1].bind(p.x, p.x + 1024);
+				exitPortal = new Portal(1 * Globals.MAP.getMapData().tilewidth,
+						19 * Globals.MAP.getMapData().tileheight + 20);
+				LoadingScreen.getInstance().setPercent(50);
 
-		p = Globals.MAP.getXYOf(2, 27);
-		dragon[2] = new Dragon(p.x, p.y);
-		dragon[2].bind(p.x, p.x + 1024);
+				Point p;
+				dragons = new ArrayList<FireDragon>();
+				FireDragon d;
+				p = Globals.MAP.getXYOf(3, 3);
+				d = new FireDragon(p.x, p.y);
+				d.bind(p.x, p.x + 1024);
+				dragons.add(d);
+				LoadingScreen.getInstance().setPercent(60);
 
-		p = Globals.MAP.getXYOf(33, 23);
-		dragon[3] = new Dragon(p.x, p.y);
-		dragon[3].bind(p.x, p.x + 1024);
+				p = Globals.MAP.getXYOf(24, 27);
+				d = new FireDragon(p.x, p.y);
+				d.bind(p.x, p.x + 1024);
+				dragons.add(d);
+				LoadingScreen.getInstance().setPercent(70);
 
-		int centerX = Globals.SCREEN_WIDTH / 2;
-		resume = new DualSprite("Buttons/ResumeActive",
-				"Buttons/ResumeInactive", centerX - 105, 100, 0.7f);
-		endgame = new DualSprite("Buttons/QuitLevelActive",
-				"Buttons/QuitLevelInactive", centerX - 105, 160, 0.7f);
-		endgame.setActiveImage(2);
+				p = Globals.MAP.getXYOf(2, 27);
+				d = new FireDragon(p.x, p.y);
+				d.bind(p.x, p.x + 1024);
+				dragons.add(d);
+				LoadingScreen.getInstance().setPercent(80);
 
-		// Follow Player
-		camera.followEntity(player);
+				p = Globals.MAP.getXYOf(33, 23);
+				d = new FireDragon(p.x, p.y);
+				d.bind(p.x, p.x + 1024);
+				dragons.add(d);
+				LoadingScreen.getInstance().setPercent(70);
 
-		suspendTime = System.currentTimeMillis();
+				int centerX = Globals.SCREEN_WIDTH / 2;
+				resume = new DualSprite("Buttons/ResumeActive",
+						"Buttons/ResumeInactive", centerX - 105, 100, 0.7f);
+				endgame = new DualSprite("Buttons/QuitLevelActive",
+						"Buttons/QuitLevelInactive", centerX - 105, 160, 0.7f);
+				endgame.setActiveImage(2);
+				LoadingScreen.getInstance().setPercent(90);
 
-		GameSystem.getInstance().changeScreen(GameSystem.LEVEL_2);
-		sendNotify("Find Eyes That Open The Exit Portal");
+				// Follow Player
+				camera.followEntity(getPlayer());
+
+				suspendTime = System.currentTimeMillis();
+
+				// GameSystem.getInstance().changeScreen(GameSystem.LEVEL_2);
+				sendNotify("Find Eyes That Open The Exit Portal");
+				LoadingScreen.getInstance().setPercent(100);
+
+			}
+		}).start();
 	}
 
 	private void populateCoins() {
@@ -153,6 +173,7 @@ public class LevelScreen_2 extends LevelScreen {
 		for (Point p : coinLocs) {
 			keys.add(new Key(p.x, p.y));
 		}
+		super.setTotalCollectables(keys.size());
 
 	}
 
@@ -180,9 +201,9 @@ public class LevelScreen_2 extends LevelScreen {
 			portalOpen.draw(g2d);
 			exitPortal.draw(g2d);
 
-			for (Dragon d : dragon)
+			for (FireDragon d : dragons)
 				d.draw(g2d);
-			player.draw(g2d);
+			getPlayer().draw(g2d);
 
 			for (Key c : keys) {
 				c.draw(g2d);
@@ -198,7 +219,7 @@ public class LevelScreen_2 extends LevelScreen {
 		Globals.SCREEN_WIDTH = sw;
 		g2d.scale(1 / scaler, 1 / scaler);
 
-		if (player.getBoundingRect().intersects(exitPortal.getBoundingRect())) {
+		if (getPlayer().getBoundingRect().intersects(exitPortal.getBoundingRect())) {
 			String str;
 			if (exitPortal.getState() == Portal.OPEN)
 				str = "Press Up To Enter The Portal";
@@ -213,7 +234,7 @@ public class LevelScreen_2 extends LevelScreen {
 			g2d.drawString(str, Globals.SCREEN_WIDTH / 2 - fm / 2 - 5, 300);
 		}
 
-		drawLifeCoinsAndEnergy(g2d);
+		super.drawStats(g2d, "Keys");
 		drawNotify(g2d);
 		if (paused) {
 			drawPaused(g2d);
@@ -228,7 +249,7 @@ public class LevelScreen_2 extends LevelScreen {
 				+ ", Camera Y: " + camera.getCameraY(), 10, 10);
 
 		g2d.setColor(Color.white);
-		g2d.drawString("State: " + player.getPlayerState(), 10, 30);
+		g2d.drawString("State: " + getPlayer().getPlayerState(), 10, 30);
 	}
 
 	private void drawPaused(Graphics2D g2d) {
@@ -274,32 +295,6 @@ public class LevelScreen_2 extends LevelScreen {
 		g2d.fillRect(centerX - 5, centerY - 5, fm + 10, 60);
 		g2d.setColor(Color.blue);
 		g2d.drawString(notifyText, centerX, centerY + 45);
-	}
-
-	private void drawLifeCoinsAndEnergy(Graphics2D g2d) {
-		int lifeX = Globals.SCREEN_WIDTH - 240;
-		int lifeY = 20;
-
-		g2d.setStroke(new BasicStroke(2));
-		g2d.setColor(hp < 20 ? Color.red : hp < 100 ? Color.magenta
-				: Color.green);
-		g2d.drawRect(lifeX, lifeY, 200, 40);
-		g2d.fillRect(lifeX, lifeY, hp, 40);
-		g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 28));
-		g2d.drawString(getLives() + " Lives", lifeX - 100, lifeY + 30);
-
-		g2d.setColor(player.getEnergy() < 20 ? Color.red
-				: player.getEnergy() < 100 ? Color.orange : Color.yellow);
-
-		g2d.drawString(player.getEnergy() + " Energy", lifeX - 370, lifeY + 75);
-		g2d.drawRect(lifeX-200, lifeY + 45, 400, 40);
-		g2d.fillRect(lifeX-200, lifeY + 45, player.getEnergy(), 40);
-
-		g2d.setColor(Color.yellow);
-		g2d.drawString(numKeys + "/" + coinLocs.length + " Keys", lifeX,
-				lifeY + 125);
-		Image img = AssetManager.getInstance().getImage("KeySingle.png");
-		g2d.drawImage(img, lifeX - 72, lifeY + 80, null);
 	}
 
 	@Override
@@ -351,10 +346,10 @@ public class LevelScreen_2 extends LevelScreen {
 			return;
 		}
 
-		if (player.getBoundingRect().intersects(exitPortal.getBoundingRect())) {
+		if (getPlayer().getBoundingRect().intersects(exitPortal.getBoundingRect())) {
 			if (exitPortal.getState() == Portal.OPEN) {
 				if (KeyboardInputService.getInstance().isUp()) {
-					player.setVisible(false);
+					getPlayer().setVisible(false);
 					exitPortal.setState(Portal.CLOSING);
 					GameSystem
 							.getInstance()
@@ -362,7 +357,8 @@ public class LevelScreen_2 extends LevelScreen {
 							.setCenter(
 									exitPortal.getBoundingRect().x
 											- camera.getCameraX()
-											+ exitPortal.getBoundingRect().width / 4,
+											+ exitPortal.getBoundingRect().width
+											/ 4,
 									exitPortal.getBoundingRect().y
 											- camera.getCameraY()
 											+ exitPortal.getBoundingRect().height
@@ -371,12 +367,18 @@ public class LevelScreen_2 extends LevelScreen {
 				}
 			}
 		}
+		
+		megaUpdate();
+		if(getPlayer().isMega()){
+			getPlayer().update();
+			return;
+		}
 
 		background.update();
 		camera.updateCamera();
-		player.update();
+		getPlayer().update();
 
-		if (player.getY() > Globals.WORLD_HEIGHT) {
+		if (getPlayer().getY() > Globals.WORLD_HEIGHT) {
 			lifeLost();
 		}
 
@@ -389,11 +391,11 @@ public class LevelScreen_2 extends LevelScreen {
 		 * scaler -= 0.2; }
 		 */
 
-		if (player.getLightning().isVisible()) {
+		if (getPlayer().getLightning().isVisible()) {
 			if (portalOpen.getBoundingRect().intersects(
-					player.getLightning().getBoundingRect())) {
+					getPlayer().getLightning().getBoundingRect())) {
 				boolean openActive = true;
-				for (Dragon d : dragon) {
+				for (FireDragon d : dragons) {
 					if (d.isVisible()) {
 						sendNotify("Kill All Dragons, Then Return Here");
 						openActive = false;
@@ -407,7 +409,7 @@ public class LevelScreen_2 extends LevelScreen {
 			}
 		}
 
-		for (Dragon d : dragon)
+		for (FireDragon d : dragons)
 			if (d.isVisible())
 				d.update();
 
@@ -415,8 +417,8 @@ public class LevelScreen_2 extends LevelScreen {
 		while (ci.hasNext()) {
 			Key c = ci.next();
 			c.update();
-			if (c.getBoundingRect().intersects(player.getBoundingRect())) {
-				numKeys++;
+			if (c.getBoundingRect().intersects(getPlayer().getBoundingRect())) {
+				setNumCollectables(getNumCollectables()+1);
 				ci.remove();
 			}
 		}
@@ -431,19 +433,19 @@ public class LevelScreen_2 extends LevelScreen {
 					|| b.getY() > camera.getCameraY() + Globals.SCREEN_HEIGHT
 							/ scaler) {
 				removal.add(b);
-			} else if (player.getLightning().isVisible()
-					&& b.getBoundingRect()
-							.intersects(player.getLightning().getBoundingRect())
-					&& !b.getSource().equals(player)) {
+			} else if (getPlayer().getLightning().isVisible()
+					&& b.getBoundingRect().intersects(
+							getPlayer().getLightning().getBoundingRect())
+					&& !b.getSource().equals(getPlayer())) {
 				removal.add(b);
-			} else if (b.getBoundingRect().intersects(player.getBoundingRect())
-					&& !b.getSource().equals(player)) {
+			} else if (b.getBoundingRect().intersects(getPlayer().getBoundingRect())
+					&& !b.getSource().equals(getPlayer())) {
 				removal.add(b);
 				decreaseHP(20);
 			} else {
-				for (Dragon d : dragon) {
+				for (FireDragon d : dragons) {
 					if (b.getBoundingRect().intersects(d.getBoundingRect())
-							&& b.getSource().equals(player)) {
+							&& b.getSource().equals(getPlayer())) {
 						d.attacked();
 						d.decreaseHP(20);
 						removal.add(b);
@@ -451,10 +453,12 @@ public class LevelScreen_2 extends LevelScreen {
 				}
 			}
 			if (!removal.contains(b)) {
-				int myX = (int) (Math.ceil((b.getBoundingRect().x + b.getBoundingRect()
-						.getWidth()) / Globals.MAP.getMapData().tilewidth));
-				int myY = (int) (Math.ceil((b.getBoundingRect().y + b.getBoundingRect()
-						.getHeight()) / Globals.MAP.getMapData().tileheight));
+				int myX = (int) (Math.ceil((b.getBoundingRect().x + b
+						.getBoundingRect().getWidth())
+						/ Globals.MAP.getMapData().tilewidth));
+				int myY = (int) (Math.ceil((b.getBoundingRect().y + b
+						.getBoundingRect().getHeight())
+						/ Globals.MAP.getMapData().tileheight));
 				for (int i = 2; i < Globals.MAP.getTileLayerCount(); i++) {
 					Tile t = Globals.MAP.getTileAt(i, myX, myY);
 					if (t == null)
@@ -482,25 +486,14 @@ public class LevelScreen_2 extends LevelScreen {
 		}
 	}
 
-	public Player getPlayer() {
-		return player;
-	}
-
 	public BackgroundManager getBackground() {
 		return background;
 	}
 
-	public void decreaseHP(int hp) {
-		this.hp -= hp;
-		if (this.hp < 0) {
-			lifeLost();
-		}
-	}
-
 	public void reset() {
 		setLives(3);
-		hp = 200;
-		numKeys=0;
+		setHp(200);
+		setNumCollectables(0);
 
 		levelEnding = false;
 
@@ -510,5 +503,15 @@ public class LevelScreen_2 extends LevelScreen {
 
 	public double getScaler() {
 		return scaler;
+	}
+
+	@Override
+	public int getScreenID() {
+		return GameSystem.LEVEL_2;
+	}
+
+	@Override
+	public ArrayList<FireDragon> getDragons() {
+		return dragons;
 	}
 }

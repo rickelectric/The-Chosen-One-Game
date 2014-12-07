@@ -43,6 +43,13 @@ public class KeyboardInputService implements KeyListener {
 	public void reset() {
 		keys = new  HashMap<Integer,Boolean>();
 	}
+	
+	public boolean anyKeyPressed() {
+		for(Integer key:keys.keySet()){
+			if(keys.get(key)) return true; 
+		}
+		return false;
+	}
 
 	public boolean isLeft() {
 		Boolean v =  keys.get(KeyEvent.VK_LEFT);
@@ -124,11 +131,9 @@ public class KeyboardInputService implements KeyListener {
 		return v==null?false:v;
 	}
 
-	public boolean anyKeyPressed() {
-		for(Integer key:keys.keySet()){
-			if(keys.get(key)) return true; 
-		}
-		return false;
+	public boolean is2() {
+		Boolean v =  keys.get(KeyEvent.VK_2);
+		return v==null?false:v;
 	}
 
 }

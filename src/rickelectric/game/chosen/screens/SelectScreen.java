@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import rickelectric.game.chosen.AssetManager;
+import rickelectric.game.chosen.CutscenesManager;
 import rickelectric.game.chosen.GameSystem;
 import rickelectric.game.chosen.Globals;
 import rickelectric.game.chosen.KeyboardInputService;
@@ -79,7 +80,7 @@ public class SelectScreen implements GameScreen {
 			return;
 		if (KeyboardInputService.getInstance().isEnter()) {
 			if (System.currentTimeMillis() - lp > 200) {
-				invokeButtonAction();
+				invokeButtonAction(true);
 			}
 		}
 		if (KeyboardInputService.getInstance().isUp()) {
@@ -127,13 +128,13 @@ public class SelectScreen implements GameScreen {
 			selX = 0;
 			selY = 2;
 			if (mis.buttonL())
-				invokeButtonAction();
+				invokeButtonAction(false);
 		}
 		if (begin.getBoundingRect().contains(p)) {
 			selX = 1;
 			selY = 2;
 			if (mis.buttonL())
-				invokeButtonAction();
+				invokeButtonAction(false);
 		}
 		outer: for (int i = 0; i < players.length; i++) {
 			for (int j = 0; j < players[i].length; j++) {
@@ -142,7 +143,7 @@ public class SelectScreen implements GameScreen {
 					selX = j;
 					selY = i;
 					if (mis.buttonL())
-						invokeButtonAction();
+						invokeButtonAction(false);
 					break outer;
 				}
 			}
@@ -159,23 +160,35 @@ public class SelectScreen implements GameScreen {
 
 	}
 
-	private void invokeButtonAction() {
+	private void invokeButtonAction(boolean cutscene) {
 		if (selY == 2) {
 			if (selX == 0)
 				GameSystem.getInstance().changeScreen(GameSystem.START_SCREEN);
 			else
-				GameSystem.getInstance().changeScreen(GameSystem.LEVEL_1_START);
+				GameSystem
+						.getInstance()
+						.changeScreen(
+								KeyboardInputService.getInstance().is2() ? GameSystem.LEVEL_2_START
+										: GameSystem.LEVEL_1_START);
 		} else {
 			selectedPlayer = ids[selY][selX];
-			if(GameSystem.getInstance().getPlayerID() == selectedPlayer) return;
+			if (GameSystem.getInstance().getPlayerID() == selectedPlayer){
+				if(cutscene){
+					CutscenesManager.getInstance().playScene(selectedPlayer, GameSystem.SELECT_PLAYER);
+					GameSystem.getInstance().changeScreen(GameSystem.CUTSCENE);
+				}
+				return;
+			}
 			GameSystem.getInstance().setPlayer(selectedPlayer);
 		}
 	}
 
 	@Override
 	public void loadScreen() {
+		LoadingScreen.getInstance().setText("Loading Players...");
 		bg = new ParallaxBackground(GameSystem.getInstance(), "JungleSunset",
 				-2f);
+		LoadingScreen.getInstance().setPercent(80);
 
 		int sx = 110, sy = 110, sw = 200, sh = 200;
 
@@ -187,6 +200,7 @@ public class SelectScreen implements GameScreen {
 				(float) (playerRects[0][0].getX() + 25),
 				(float) (playerRects[0][0].getY() + 15), player.getNumFrames(),
 				40);
+		LoadingScreen.getInstance().setPercent(83);
 
 		player = PlayerID.Woman1;
 		ids[0][1] = player;
@@ -195,6 +209,7 @@ public class SelectScreen implements GameScreen {
 				(float) (playerRects[0][1].getX() + 45),
 				(float) (playerRects[0][1].getY() + 15), player.getNumFrames(),
 				40);
+		LoadingScreen.getInstance().setPercent(85);
 
 		player = PlayerID.Man2;
 		ids[0][2] = player;
@@ -204,6 +219,7 @@ public class SelectScreen implements GameScreen {
 				(float) (playerRects[0][2].getX() + 55),
 				(float) (playerRects[0][2].getY() + 15), player.getNumFrames(),
 				40);
+		LoadingScreen.getInstance().setPercent(87);
 
 		player = PlayerID.Ghost;
 		ids[0][3] = player;
@@ -213,6 +229,7 @@ public class SelectScreen implements GameScreen {
 				(float) (playerRects[0][3].getX() + 55),
 				(float) (playerRects[0][3].getY() + 15), player.getNumFrames(),
 				40);
+		LoadingScreen.getInstance().setPercent(90);
 
 		player = PlayerID.Woman2;
 		ids[1][0] = player;
@@ -221,17 +238,19 @@ public class SelectScreen implements GameScreen {
 				(float) (playerRects[1][0].getX() + 55),
 				(float) (playerRects[1][0].getY() + 15), player.getNumFrames(),
 				40);
+		LoadingScreen.getInstance().setPercent(93);
 
 		player = PlayerID.Woman3;
 		ids[1][1] = player;
 		playerRects[1][1] = new Rectangle2D.Double(sx + (sw + 10), sy
 				+ (sh + 10), sw, sh);
-		players[1][1] = new AnimatedSprite(player.getImageL(),
+		players[1][1] = new AnimatedSprite(player.getImageR(),
 				(float) (playerRects[1][1].getX() + 55),
 				(float) (playerRects[1][1].getY() + 15), player.getNumFrames(),
 				40);
+		LoadingScreen.getInstance().setPercent(95);
 
-		player = PlayerID.Woman;
+		player = PlayerID.Cyber;
 		ids[1][2] = player;
 		playerRects[1][2] = new Rectangle2D.Double(sx + 2 * (sw + 10), sy
 				+ (sh + 10), sw, sh);
@@ -239,6 +258,7 @@ public class SelectScreen implements GameScreen {
 				(float) (playerRects[1][2].getX() + 55),
 				(float) (playerRects[1][2].getY() + 25), player.getNumFrames(),
 				40);
+		LoadingScreen.getInstance().setPercent(97);
 
 		player = PlayerID.Man3;
 		ids[1][3] = player;
@@ -248,6 +268,7 @@ public class SelectScreen implements GameScreen {
 				(float) (playerRects[1][3].getX() + 25),
 				(float) (playerRects[1][3].getY() + 25), player.getNumFrames(),
 				40);
+		LoadingScreen.getInstance().setPercent(99);
 
 		back = new DualSprite("Buttons/BackActive", "Buttons/BackInactive",
 				110, 550, 1f);
@@ -256,7 +277,7 @@ public class SelectScreen implements GameScreen {
 		begin = new DualSprite("Buttons/BeginActive", "Buttons/BeginInactive",
 				330, 550, 1f);
 		begin.setActiveImage(2);
-
+		LoadingScreen.getInstance().setPercent(100);
 	}
 
 	public PlayerID getSelectedPlayer() {

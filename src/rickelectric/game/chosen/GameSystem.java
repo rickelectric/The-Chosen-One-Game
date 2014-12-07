@@ -72,12 +72,6 @@ public class GameSystem implements Runnable {
 		gameOverScreen = new GameOverScreen();
 
 		difficulty = EASY;
-		new Thread(new Runnable() {
-			public void run() {
-				CutscenesManager.getInstance();
-			}
-		}).start();
-		changeScreen(LOADING_SCREEN);
 	}
 
 	/**
@@ -97,9 +91,15 @@ public class GameSystem implements Runnable {
 	 */
 	public void run() {
 		BufferStrategy bs = gameFrame.getBufferStrategy();
-		startScreen.loadScreen();
-		helpScreen.loadScreen();
-		selectScreen.loadScreen();
+		changeScreen(LOADING_SCREEN);
+		new Thread(new Runnable(){
+			public void run(){
+				CutscenesManager.getInstance();
+				startScreen.loadScreen();
+				helpScreen.loadScreen();
+				selectScreen.loadScreen();
+			}
+		}).start();
 		while (true) {
 			switch (screen) {
 			case LOADING_SCREEN:
@@ -154,14 +154,6 @@ public class GameSystem implements Runnable {
 	}
 
 	private void runStartScreen(BufferStrategy bs) {
-		if (KeyboardInputService.getInstance().isA()) {
-			playCutscene(PlayerID.Man2);
-		} else if (KeyboardInputService.getInstance().isS()) {
-			playCutscene(PlayerID.Woman3);
-		} else if (KeyboardInputService.getInstance().isD()) {
-			playCutscene(PlayerID.Ghost);
-		}
-
 		startScreen.update();
 		startScreen.draw((Graphics2D) bs.getDrawGraphics());
 		levelScreen.reset();

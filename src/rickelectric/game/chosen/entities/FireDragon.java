@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 
 import rickelectric.game.chosen.GameSystem;
 
-public class Dragon extends DualAnimatedSprite {
+public class FireDragon extends DualAnimatedSprite {
 
 	private float boundX1, boundX2;
 	private Lightning dragonBolt;
@@ -13,7 +13,7 @@ public class Dragon extends DualAnimatedSprite {
 
 	private int hp;
 
-	public Dragon(float x, float y) {
+	public FireDragon(float x, float y) {
 		super("Dragon/Dragon-R", "Dragon/Dragon-L", x, y, 13, 20, 1);
 		boundX1 = x;
 		boundX2 = x + 300;

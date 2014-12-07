@@ -21,10 +21,18 @@ public class LoadingScreen implements GameScreen {
 
 	private String loadingText;
 	private int loadingPercent;
+	private int returnScreen;
 
 	private LoadingScreen() {
 		loadingText = "Loading...";
 		loadingPercent = 0;
+		returnScreen = GameSystem.START_SCREEN;
+	}
+
+	public void loading(int returnScreen) {
+		this.returnScreen = returnScreen;
+		loadingPercent = 0;
+		loadingText = "Loading...";
 	}
 
 	public void draw(Graphics2D g2d) {
@@ -45,7 +53,7 @@ public class LoadingScreen implements GameScreen {
 		g2d.drawRect(100, Globals.SCREEN_HEIGHT / 2 - 20,
 				Globals.SCREEN_WIDTH - 200, 40);
 		g2d.fillRect(100, Globals.SCREEN_HEIGHT / 2 - 20,
-				(int)((loadingPercent / 100f) * tLen), 40);
+				(int) ((loadingPercent / 100f) * tLen), 40);
 	}
 
 	public void setPercent(int percent) {
@@ -54,7 +62,7 @@ public class LoadingScreen implements GameScreen {
 
 	public void update() {
 		if (loadingPercent >= 100) {
-			GameSystem.getInstance().changeScreen(GameSystem.START_SCREEN);
+			GameSystem.getInstance().changeScreen(returnScreen);
 		}
 	}
 

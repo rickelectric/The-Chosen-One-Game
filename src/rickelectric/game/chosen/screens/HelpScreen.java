@@ -77,12 +77,15 @@ public class HelpScreen implements GameScreen {
 
 	@Override
 	public void loadScreen() {
+		LoadingScreen.getInstance().setText("Loading Help...");
 		bg = new ParallaxBackground(GameSystem.getInstance(), "JungleDay",
 				-0.5f);
+		LoadingScreen.getInstance().setPercent(60);
 		e = new CatEyes(600, 220);
-
+		LoadingScreen.getInstance().setPercent(70);
 		back = new DualSprite("Buttons/BackActive", "Buttons/BackInactive",
 				Globals.SCREEN_WIDTH - 300, 20, 1f);
+		LoadingScreen.getInstance().setPercent(75);
 		back.setActiveImage(2);
 	}
 

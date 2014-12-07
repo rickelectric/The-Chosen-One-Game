@@ -64,8 +64,7 @@ public class ParallaxBackground implements GameEntityServices {
 	}
 
 	public void setRepeat(boolean b) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	public void reset() {

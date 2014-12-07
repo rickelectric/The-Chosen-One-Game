@@ -4,7 +4,9 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import rickelectric.game.chosen.BackgroundManager;
 import rickelectric.game.chosen.GameSystem;
@@ -12,27 +14,28 @@ import rickelectric.game.chosen.Globals;
 import rickelectric.game.chosen.entities.Bullet;
 import rickelectric.game.chosen.entities.BulletPool;
 import rickelectric.game.chosen.entities.Entity;
+import rickelectric.game.chosen.entities.FireDragon;
 import rickelectric.game.chosen.entities.Player;
 import rickelectric.game.chosen.entities.PlayerID;
 
 public abstract class LevelScreen implements GameScreen {
 
 	private ArrayList<Bullet> bullets;
-	
+
 	private int lives;
 	private int hp;
-	private int numCollectables,totalCollectables;
+	private int numCollectables, totalCollectables;
 
 	private PlayerID playerID;
 	private Player player;
 
-	public LevelScreen(PlayerID playerID){
+	public LevelScreen(PlayerID playerID) {
 		this.playerID = playerID;
 		lives = 3;
-		hp=200;
-		numCollectables=0;
+		hp = 200;
+		numCollectables = 0;
 	}
-	
+
 	public void lifeLost() {
 		if (lives > 1) {
 			sendNotify("You Died");
@@ -41,7 +44,7 @@ public abstract class LevelScreen implements GameScreen {
 			lives--;
 			hp = 200;
 		} else {
-			lives=0;
+			lives = 0;
 			GameSystem.getInstance().changeScreen(GameSystem.GAME_OVER);
 		}
 		getBackground().reset();
@@ -69,9 +72,9 @@ public abstract class LevelScreen implements GameScreen {
 
 	public void loadScreen() {
 		setPlayer(playerID);
-		
+
 		bullets = new ArrayList<Bullet>();
-		
+
 		// Initialize 20 Bullets To Pool To Increase Speed In Game.
 		for (int i = 0; i < 20; i++)
 			BulletPool.getInstance().addReusable(new Bullet(null, 0, 0, 0, 0));
@@ -113,32 +116,35 @@ public abstract class LevelScreen implements GameScreen {
 		g2d.drawString(getLives() + " Lives", lifeX - 100, lifeY + 24);
 
 		g2d.setColor(player.getEnergy() < 20 ? Color.red
-				: player.getEnergy() < 100 ? Color.orange :player.getEnergy()<300 ? Color.yellow:Color.cyan);
+				: player.getEnergy() < 100 ? Color.orange
+						: player.getEnergy() < 300 ? Color.yellow : Color.cyan);
 		g2d.drawString(player.getEnergy() + " Energy", lifeX - 370, lifeY + 75);
-		g2d.drawRect(lifeX-200, lifeY + 45, 400, 40);
-		g2d.fillRect(lifeX-200, lifeY + 45, player.getEnergy(), 40);
-		if(player.getEnergy()>=300){
+		g2d.drawRect(lifeX - 200, lifeY + 45, 400, 40);
+		g2d.fillRect(lifeX - 200, lifeY + 45, player.getEnergy(), 40);
+		if (player.getEnergy() >= 300) {
 			g2d.setColor(Color.red);
 			String mega = "MEGA (Up + A)";
-			g2d.drawString(mega, lifeX-(g2d.getFontMetrics().stringWidth(mega)/2), lifeY+75);
+			g2d.drawString(mega, lifeX
+					- (g2d.getFontMetrics().stringWidth(mega) / 2), lifeY + 75);
 		}
 
 		g2d.setColor(Color.yellow);
-		g2d.drawString(numCollectables + "/"+totalCollectables+" Coins", lifeX, lifeY + 125);
+		g2d.drawString(numCollectables + "/" + totalCollectables + " Coins",
+				lifeX, lifeY + 125);
 	}
 
 	public PlayerID getPlayerID() {
 		return playerID;
 	}
-	
-	public int getLives(){
+
+	public int getLives() {
 		return lives;
 	}
-	
-	public void setLives(int lives){
-		this.lives=lives;
+
+	public void setLives(int lives) {
+		this.lives = lives;
 	}
-	
+
 	public int getNumCollectables() {
 		return numCollectables;
 	}
@@ -163,4 +169,91 @@ public abstract class LevelScreen implements GameScreen {
 		this.hp = hp;
 	}
 
+	public abstract int getScreenID();
+
+	public void megaRelease() {
+		bullets.removeAll(bullets);
+		// TODO Implement This Attack/Ability.
+		// TODO Big Attack/Power Based On PlayerID
+
+		switch (playerID) {
+		case Cyber:
+			// TODO Ominous stream of symbols thrown in all directions, damaging
+			// everything it touches.
+			break;
+		case Ghost:
+			ghostAttack = new ArrayList<Ellipse2D>();
+			for (int i = 0; i < 80; i++) {
+				ghostAttack.add(new Ellipse2D.Double(getPlayer().getX(),
+						getPlayer().getY(), 30, 15));
+			}
+			// TODO Mosaic of Yellow Oval Bullets In All Directions, Damaging
+			// everything it hits.
+			break;
+		case Man1:
+			// TODO Stop Time, Player Is Invincible.
+			break;
+		case Man2:
+			// TODO Player In Air, Big Gun Over Shoulder Shoots Giant White
+			// Ball Positive To Player's Direction
+			break;
+		case Man3:
+			// TODO Air strike Of fiery cannon balls dropped from the sailor's
+			// mother-ship (partially visible from top of screen)
+			break;
+		case Woman1:
+			// TODO Concentric Circular Ice Wave, Damaging everything within
+			// it's
+			// radius while moving.
+			break;
+		case Woman2:
+			// TODO Lightning Fills Up The Entire Screen, Damaging Everything.
+			break;
+		case Woman3:
+			// TODO Thick Lines Of Fire Blast In Both Directions, Damaging
+			// Everything
+			break;
+		}
+	}
+
+	private ArrayList<Ellipse2D> ghostAttack;
+
+	public void megaUpdate() {
+		updateGhostAttack();
+	}
+
+	public void megaDraw(Graphics2D g2d) {
+		drawGhostAttack(g2d);
+	}
+
+	public void updateGhostAttack() {
+		if (ghostAttack != null)
+			for (Ellipse2D e : ghostAttack) {
+				e.setFrame(e.getX() + (40 * Math.random()), e.getY()
+						+ (30 * Math.random() - 15), e.getWidth(), e.getHeight());
+				Iterator<Bullet> v = bullets.iterator();
+				while(v.hasNext()){
+					Bullet b= v.next();
+					if(e.intersects(b.getBoundingRect())){
+						v.remove();
+					}
+				}
+				for(FireDragon d:getDragons()){
+					if(e.intersects(d.getBoundingRect())){
+						d.attacked();
+						d.decreaseHP(10);
+					}
+				}
+			}
+	}
+
+	public void drawGhostAttack(Graphics2D g2d) {
+		g2d.setColor(Color.yellow);
+		if (ghostAttack != null)
+			for (Ellipse2D e : ghostAttack) {
+				g2d.fill(e);
+			}
+	}
+	
+	public abstract ArrayList<FireDragon> getDragons();
 }

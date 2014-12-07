@@ -69,7 +69,6 @@ public class MyGeometry {
 		System.out.println("Theta: "+theta+"\nWide Theta: "+wideTheta+"\nRadAngle: "+radAngle);
 		
 		if(3*Math.PI/2 < radAngle && radAngle  < Math.PI/2 - theta){
-			//TODO On Right Hyp
 			double dist = 2*Math.sin(theta) / height;
 			Point d = getPointOnCircle(center, dist, degAngle);
 			double hn = (center.y - height/2) + d.y;
@@ -79,7 +78,6 @@ public class MyGeometry {
 			return np;
 		}
 		else if(Math.PI/2 - theta <=radAngle && radAngle <= Math.PI/2 + theta){
-			//TODO On Base
 			double dist = 2*Math.sin(theta) / height;
 			Point d = getPointOnCircle(center, dist, degAngle);
 			Point np = new Point();
@@ -87,7 +85,6 @@ public class MyGeometry {
 			return np;
 		}
 		else if(Math.PI/2 + theta < radAngle && radAngle  < 3*Math.PI/2){
-			//TODO On Left Hyp
 			double dist = 2*Math.sin(theta) / height;
 			Point d = getPointOnCircle(center, dist, degAngle);
 			double hn = (center.y - height/2) + d.y;

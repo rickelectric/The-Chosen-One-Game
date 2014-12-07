@@ -1,7 +1,7 @@
 package rickelectric.game.chosen.entities;
 
 public enum PlayerID {
-	Man1, Man2, Man3, Ghost, Woman1, Woman2, Woman3, Woman;
+	Man1, Man2, Man3, Ghost, Woman1, Woman2, Woman3, Cyber;
 	
 	public String getPlayerName() {
 		switch (this) {
@@ -62,7 +62,7 @@ public enum PlayerID {
 		case Woman3:
 			return "woman-3-L";
 		default:
-			return "woman-4-L";
+			return "cyber-L";
 		}
 	}
 
@@ -83,7 +83,7 @@ public enum PlayerID {
 		case Woman3:
 			return "woman-3-R";
 		default:
-			return "woman-4-R";
+			return "cyber-R";
 		}
 	}
 

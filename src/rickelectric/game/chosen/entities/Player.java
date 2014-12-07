@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
+import rickelectric.game.chosen.CutscenesManager;
 import rickelectric.game.chosen.GameSystem;
 import rickelectric.game.chosen.Globals;
 import rickelectric.game.chosen.KeyboardInputService;
@@ -53,6 +54,9 @@ public class Player extends DualAnimatedSprite {
 	private long lastJump;
 	private double energy;
 
+	private DualAnimatedSprite megaTrans;
+	private boolean megaOn, postMega;
+
 	public Player(PlayerID player, float x, float y) {
 		super(player.getImageR(), player.getImageL(), x, y, player
 				.getNumFrames(), 35, player.reverseImageID());
@@ -79,6 +83,7 @@ public class Player extends DualAnimatedSprite {
 		lightning = new Lightning(x + boundingRect.width, y + height / 2);
 
 		boundingRect.setLocation((int) x, (int) y);
+		postMega = megaOn = false;
 	}
 
 	public void setDuration(int duration) {
@@ -106,8 +111,9 @@ public class Player extends DualAnimatedSprite {
 
 	public void update() {
 		// Check Motion
-		int horizontal = KeyboardInputService.getInstance().isLeft() ? -1
-				: (KeyboardInputService.getInstance().isRight() ? 1 : 0);
+		int horizontal = megaOn || postMega ? 0 : KeyboardInputService
+				.getInstance().isLeft() ? -1 : (KeyboardInputService
+				.getInstance().isRight() ? 1 : 0);
 
 		// Player movement
 		if (horizontal != 0) {
@@ -119,7 +125,7 @@ public class Player extends DualAnimatedSprite {
 			setFrame(player.restOrdinalID());
 		}
 
-		if (velocityX != 0) {
+		if (!(megaOn || postMega) && velocityX != 0) {
 			direction = Direction.Horizontal;
 			if (velocityX > 0) {
 				velocityX -= playerState == PlayerState.OnGround ? drag
@@ -132,11 +138,41 @@ public class Player extends DualAnimatedSprite {
 				if (velocityX > 0)
 					velocityX = 0;
 			}
+			setX(x + velocityX);
+		}
+
+		if (postMega) {
+			postMegaRelease();
+		}
+
+		if (megaOn) {
+			if (megaTrans != null) {
+				if (megaTrans.isHasFinished()) {
+					megaAttack();
+				} else
+					megaTrans.update();
+			} else
+				megaAttack();
+		}
+
+		if (!(megaOn || postMega) && KeyboardInputService.getInstance().isUp()
+				&& KeyboardInputService.getInstance().isA()
+				&& getEnergy() >= 300) {
+
+			if (player == PlayerID.Ghost && megaOn == false) {
+				megaTrans = new DualAnimatedSprite(
+						"Cutscenes/Ghost/GhostTransforms-R",
+						"Cutscenes/Ghost/GhostTransforms-L", x, y, 18, 40, 2);
+				megaTrans.setActiveImage(getActiveImage());
+				megaTrans.setLooping(false);
+			}
+			megaOn = true;
+			energy -= 300;
 
 		}
-		setX(x + velocityX);
 
-		if (KeyboardInputService.getInstance().isZ() && energy >= 10) {
+		if (!(megaOn || postMega) && KeyboardInputService.getInstance().isZ()
+				&& energy >= 10) {
 			if (velocityX != 0 || velocityY != 0) {
 				lightning.setX(x
 						+ (activeImage == 1 ? boundingRect.width
@@ -164,7 +200,7 @@ public class Player extends DualAnimatedSprite {
 			lightning.setVisible(false);
 		}
 
-		if (KeyboardInputService.getInstance().isX()
+		if (!(megaOn || postMega) && KeyboardInputService.getInstance().isX()
 				&& System.currentTimeMillis() - shootTime > 200 && energy >= 20) {
 			GameSystem
 					.getInstance()
@@ -184,7 +220,9 @@ public class Player extends DualAnimatedSprite {
 
 		// Check For Ceiling Above @fn 2
 
-		if (KeyboardInputService.getInstance().isSpace() && doubleJump < 2
+		if (!(megaOn || postMega)
+				&& KeyboardInputService.getInstance().isSpace()
+				&& doubleJump < 2
 				&& System.currentTimeMillis() - lastJump > 500) {
 			lastJump = System.currentTimeMillis();
 			this.playerState = PlayerState.InAir;
@@ -194,11 +232,15 @@ public class Player extends DualAnimatedSprite {
 
 		switch (playerState) {
 		case InAir:
+			if (megaOn || postMega)
+				break;
 			velocityY += gravity;
 			y += velocityY;
 			setFrame(player.jumpOrdinalID());
 			break;
 		case OnGround:
+			if (megaOn || postMega)
+				break;
 			doubleJump = 0;
 			if (horizontal != 0)
 				super.update();
@@ -219,7 +261,21 @@ public class Player extends DualAnimatedSprite {
 		handleTileCollisions0(direction);
 
 		// Restore Energy
-		restoreEnergy();
+		if (!megaOn)
+			restoreEnergy();
+	}
+
+	private void megaAttack() {
+		CutscenesManager.getInstance().playScene(player,
+				GameSystem.getInstance().getLevelScreen().getScreenID());
+		GameSystem.getInstance().changeScreen(GameSystem.CUTSCENE);
+		megaOn = false;
+		postMega = true;
+	}
+
+	private void postMegaRelease() {
+		GameSystem.getInstance().getLevelScreen().megaRelease();
+		postMega = false;
 	}
 
 	private void restoreEnergy() {
@@ -264,7 +320,11 @@ public class Player extends DualAnimatedSprite {
 
 	public void draw(Graphics2D g2d) {
 		g2d.setColor(Color.red);
-		super.draw(g2d);
+		if (megaOn && megaTrans != null) {
+			megaTrans.draw(g2d);
+		} else {
+			super.draw(g2d);
+		}
 		if (KeyboardInputService.getInstance().isDown()
 				&& KeyboardInputService.getInstance().isA()) {
 			g2d.setStroke(new BasicStroke(6));
@@ -339,6 +399,10 @@ public class Player extends DualAnimatedSprite {
 
 	public int getEnergy() {
 		return (int) energy;
+	}
+
+	public boolean isMega() {
+		return megaOn||postMega;
 	}
 
 }
