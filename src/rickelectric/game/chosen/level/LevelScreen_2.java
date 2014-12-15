@@ -73,6 +73,7 @@ public class LevelScreen_2 extends LevelScreen {
 			public void run() {
 
 				LoadingScreen.getInstance().setText("Loading Level 2...");
+				LevelScreen_2.super.loadScreen();
 				LoadingScreen.getInstance().setPercent(0);
 				background = new BackgroundManager(GameSystem.getInstance(), 2);
 				LoadingScreen.getInstance().setPercent(10);

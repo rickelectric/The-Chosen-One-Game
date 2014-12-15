@@ -96,7 +96,6 @@ public class GameSystem implements Runnable {
 			public void run(){
 				CutscenesManager.getInstance();
 				startScreen.loadScreen();
-				SoundManager.getInstance().playSound("title", true);
 				helpScreen.loadScreen();
 				selectScreen.loadScreen();
 			}
@@ -117,8 +116,6 @@ public class GameSystem implements Runnable {
 				break;
 			case LEVEL_1_START:
 				levelScreen.loadScreen();
-				SoundManager.getInstance().stopAll();
-				SoundManager.getInstance().playSound("xfiles", true);
 				break;
 			case LEVEL_1:
 				lastLevel = LEVEL_1;
@@ -126,8 +123,6 @@ public class GameSystem implements Runnable {
 				break;
 			case LEVEL_2_START:
 				level2Screen.loadScreen();
-				SoundManager.getInstance().stopAll();
-				SoundManager.getInstance().playSound("space", true);
 				break;
 			case LEVEL_2:
 				lastLevel = LEVEL_2;
@@ -226,6 +221,35 @@ public class GameSystem implements Runnable {
 	public void changeScreen(int screenID) {
 		screen = screenID;
 		switchTime = System.currentTimeMillis();
+		soundOff();
+	}
+
+	private void soundOff() {
+		SoundManager.getInstance().stopAll();
+		switch (screen) {
+		case START_SCREEN:
+			SoundManager.getInstance().playSound("title", true);
+			break;
+		case SELECT_PLAYER:
+			SoundManager.getInstance().playSound("theme", true);
+			break;
+		case HELP_SCREEN:
+			SoundManager.getInstance().playSound("title", true);
+			break;
+		case LEVEL_1:
+			SoundManager.getInstance().playSound("xfiles", true);
+			break;
+		case LEVEL_2:
+			SoundManager.getInstance().playSound("space", true);
+			break;
+		case CUTSCENE:
+			break;
+		case VORTEX:
+			SoundManager.getInstance().playSound("vortex", true);
+			break;
+		case GAME_OVER:
+			break;
+		}
 	}
 
 	public long lastSwitchTime() {
