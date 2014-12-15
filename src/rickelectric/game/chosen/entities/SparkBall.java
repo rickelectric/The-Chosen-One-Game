@@ -1,5 +1,5 @@
 package rickelectric.game.chosen.entities;
-public class Bullet extends AnimatedSprite {
+public class SparkBall extends AnimatedSprite implements Projectile {
 
 	public double dx, dy;
 	private float speed;
@@ -7,7 +7,7 @@ public class Bullet extends AnimatedSprite {
 	private int angle;
 	private Entity source;
 
-	public Bullet(Entity source, float x, float y, int angle, int speed) {
+	public SparkBall(Entity source, float x, float y, int angle, int speed) {
 		super("Buzz", x, y, 16, 40);
 		this.source = source;
 		if (source != null) {
@@ -67,7 +67,7 @@ public class Bullet extends AnimatedSprite {
 		calcDyDx(angle);
 	}
 
-	public void setSpeed(int speed) {
+	public void setSpeed(float speed) {
 		this.speed = speed;
 		calcDyDx(angle);
 	}

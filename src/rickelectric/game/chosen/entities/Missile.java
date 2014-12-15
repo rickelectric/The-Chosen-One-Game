@@ -1,7 +1,7 @@
 package rickelectric.game.chosen.entities;
 import java.awt.Graphics2D;
 
-public class Missile extends Entity {
+public class Missile extends Entity implements Projectile{
 
 	private float speed;
 	private int type;
@@ -79,7 +79,7 @@ public class Missile extends Entity {
 		return type;
 	}
 
-	public void setSpeed(int speed) {
+	public void setSpeed(float speed) {
 		this.speed = speed;
 	}
 

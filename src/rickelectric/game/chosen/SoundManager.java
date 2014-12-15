@@ -1,4 +1,5 @@
 package rickelectric.game.chosen;
+
 import java.applet.Applet;
 import java.applet.AudioClip;
 import java.util.HashMap;
@@ -28,7 +29,11 @@ public class SoundManager {
 	 * Build our hash table
 	 */
 	private void loadSounds() {
-		sounds.put("xfiles", getSound("/sounds/xfiles.wav"));
+		sounds.put("xfiles", getSound("sounds/xfiles.wav"));
+		sounds.put("space", getSound("sounds/space.wav"));
+		sounds.put("theme", getSound("sounds/theme.wav"));
+		sounds.put("title", getSound("sounds/title.wav"));
+		sounds.put("lightning", getSound("sounds/lightning.wav"));
 	}
 
 	/**
@@ -39,7 +44,7 @@ public class SoundManager {
 	 */
 	public void playSound(String name, boolean loop) {
 		AudioClip ac = sounds.get(name);
-		if(ac!=null){
+		if (ac != null) {
 			if (loop)
 				ac.loop();
 			else

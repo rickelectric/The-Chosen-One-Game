@@ -1,4 +1,5 @@
 package rickelectric.game.chosen.level;
+
 import java.awt.Graphics2D;
 
 import rickelectric.game.chosen.GameSystem;
@@ -52,13 +53,10 @@ public class Camera {
 		if (entity != null) {
 			float translateX = -(entity.getX() + entity.getWidth() / 2 - GameSystem
 					.getInstance().getScreenWidth() / 2);
-			if ((-translateX >= 0
-					&& -translateX
-							+ Globals.SCREEN_WIDTH
-							/ GameSystem.getInstance().getLevelScreen()
-									.getScaler() < Globals.WORLD_WIDTH))
+			if ((-translateX >= 0 && -translateX + Globals.SCREEN_WIDTH
+					/ GameSystem.getInstance().getLevelScreen().getScaler() < Globals.WORLD_WIDTH))
 				this.translateX = translateX;
-			if(entity.getBoundingRect().x < -translateX){
+			if (entity.getBoundingRect().x < -translateX) {
 				this.translateX = 0;
 			}
 			float translateY = -(entity.getY() + entity.getHeight() / 2 - GameSystem

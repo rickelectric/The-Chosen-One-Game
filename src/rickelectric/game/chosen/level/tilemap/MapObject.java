@@ -6,7 +6,7 @@ public class MapObject {
 	int height;
 	String name;
 	PolyPoint[] polyline;
-	int rotation;
+	double rotation;
 	String type;
 	boolean visible;
 	int width;

@@ -1,10 +1,15 @@
-package rickelectric.game.chosen.entities;
+package rickelectric.game.chosen.entities.enemies;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 
 import rickelectric.game.chosen.GameSystem;
+import rickelectric.game.chosen.entities.DualAnimatedSprite;
+import rickelectric.game.chosen.entities.Lightning;
 
-public class FireDragon extends DualAnimatedSprite {
+public class LightningDragon extends DualAnimatedSprite implements Dragon {
+
+	private static final int MAX_HP = 3000;
 
 	private float boundX1, boundX2;
 	private Lightning dragonBolt;
@@ -13,8 +18,8 @@ public class FireDragon extends DualAnimatedSprite {
 
 	private int hp;
 
-	public FireDragon(float x, float y) {
-		super("Dragon/Dragon-R", "Dragon/Dragon-L", x, y, 13, 20, 1);
+	public LightningDragon(float x, float y) {
+		super("Dragon/FireDragon-R", "Dragon/FireDragon-L", x, y, 13, 20, 1);
 		boundX1 = x;
 		boundX2 = x + 300;
 		boundingRect.setBounds((int) x, (int) y, (int) frameWidth,
@@ -24,11 +29,11 @@ public class FireDragon extends DualAnimatedSprite {
 		dragonBolt.setVisible(false);
 		dragonBolt.setElevation(-1);
 
-		hp = 3000;
+		hp = MAX_HP;
 		lastAttacked = System.currentTimeMillis() - 20000;
 	}
 
-	public void bind(int x1, int x2) {
+	public void bind(float x1, float x2) {
 		this.boundX1 = x1;
 		this.boundX2 = x2;
 	}
@@ -39,8 +44,9 @@ public class FireDragon extends DualAnimatedSprite {
 			this.setActiveImage(1);
 		if (x > boundX2)
 			this.setActiveImage(2);
-		int inc = moveAttacked()?20:10;
-		this.setX(activeImage == 1 ? boundingRect.x + inc : boundingRect.x - inc);
+		int inc = moveAttacked() ? 20 : 10;
+		this.setX(activeImage == 1 ? boundingRect.x + inc : boundingRect.x
+				- inc);
 
 		if (activeImage == 1) {
 			dragonBolt.setX(boundingRect.x + boundingRect.width - 5);
@@ -51,8 +57,8 @@ public class FireDragon extends DualAnimatedSprite {
 			dragonBolt.setDirection(-1);
 			dragonBolt.update();
 		}
-		if (GameSystem.getInstance().getLevelScreen().getPlayer().boundingRect
-				.intersects(dragonBolt.boundingRect)) {
+		if (GameSystem.getInstance().getLevelScreen().getPlayer()
+				.getBoundingRect().intersects(dragonBolt.getBoundingRect())) {
 			if (Math.random() < 0.3) {
 				dragonBolt.setVisible(true);
 				GameSystem.getInstance().getLevelScreen().decreaseHP(2);
@@ -61,15 +67,15 @@ public class FireDragon extends DualAnimatedSprite {
 			dragonBolt.setVisible(false);
 
 		if (GameSystem.getInstance().getLevelScreen().getPlayer()
-				.getLightning().boundingRect.intersects(boundingRect)
+				.getLightning().getBoundingRect().intersects(boundingRect)
 				&& GameSystem.getInstance().getLevelScreen().getPlayer()
 						.getLightning().isVisible()) {
 			attacked();
 			decreaseHP(50);
 		}
 
-		if (GameSystem.getInstance().getLevelScreen().getPlayer().boundingRect
-				.intersects(boundingRect)) {
+		if (GameSystem.getInstance().getLevelScreen().getPlayer()
+				.getBoundingRect().intersects(boundingRect)) {
 			GameSystem.getInstance().getLevelScreen().decreaseHP(1);
 		}
 
@@ -83,20 +89,22 @@ public class FireDragon extends DualAnimatedSprite {
 			dragonBolt.draw(g2d);
 		}
 		if (beingAttacked()) {
-			g2d.setColor(hp < 200 ? Color.red : hp < 1500 ? Color.orange
-					: Color.yellow);
+			g2d.setColor(hp < MAX_HP / 5 ? Color.red
+					: hp < MAX_HP / 2 ? Color.orange
+							: hp < ((MAX_HP / 4) * 3) ? Color.yellow
+									: Color.green);
 			g2d.drawRect((int) (x + frameWidth / 2 - 50), (int) (y - 30), 100,
 					20);
 			g2d.fillRect((int) (x + frameWidth / 2 - 50), (int) (y - 30),
-					hp / 30, 20);
+					(int) (((float)hp/(float)MAX_HP)*100f), 20);
 		}
 	}
 
 	public Lightning getLightning() {
 		return dragonBolt;
 	}
-	
-	private boolean moveAttacked(){
+
+	private boolean moveAttacked() {
 		return System.currentTimeMillis() - lastAttacked < 800;
 	}
 
@@ -116,7 +124,7 @@ public class FireDragon extends DualAnimatedSprite {
 		}
 	}
 
-	private void destroy() {
+	public void destroy() {
 		setVisible(false);
 		dragonBolt.setVisible(false);
 	}

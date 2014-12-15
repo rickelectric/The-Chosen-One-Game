@@ -1,7 +1,7 @@
 package rickelectric.game.chosen.entities;
 
 
-public class BulletPool extends ObjectPool<Bullet> {
+public class BulletPool extends ObjectPool<SparkBall> {
 	
 	private static BulletPool objectPool = null;
 

@@ -13,6 +13,7 @@ import rickelectric.game.chosen.Globals;
 import rickelectric.game.chosen.KeyboardInputService;
 import rickelectric.game.chosen.MyGeometry;
 import rickelectric.game.chosen.RectangleOperations;
+import rickelectric.game.chosen.SoundManager;
 import rickelectric.game.chosen.level.LevelScreen_1;
 import rickelectric.game.chosen.level.tilemap.Tile;
 
@@ -198,6 +199,10 @@ public class Player extends DualAnimatedSprite {
 			}
 		} else {
 			lightning.setVisible(false);
+			SoundManager.getInstance().stopSound("lightning");
+		}
+		if(lightning.isVisible()){
+			SoundManager.getInstance().playSound("lightning", false);
 		}
 
 		if (!(megaOn || postMega) && KeyboardInputService.getInstance().isX()
@@ -224,10 +229,7 @@ public class Player extends DualAnimatedSprite {
 				&& KeyboardInputService.getInstance().isSpace()
 				&& doubleJump < 2
 				&& System.currentTimeMillis() - lastJump > 500) {
-			lastJump = System.currentTimeMillis();
-			this.playerState = PlayerState.InAir;
-			velocityY = -jumpForce;
-			doubleJump++;
+			jump(true);
 		}
 
 		switch (playerState) {
@@ -265,6 +267,13 @@ public class Player extends DualAnimatedSprite {
 			restoreEnergy();
 	}
 
+	private void jump(boolean full) {
+		lastJump = System.currentTimeMillis();
+		this.playerState = PlayerState.InAir;
+		velocityY = -(full?jumpForce:jumpForce/2);
+		doubleJump++;
+	}
+
 	private void megaAttack() {
 		CutscenesManager.getInstance().playScene(player,
 				GameSystem.getInstance().getLevelScreen().getScreenID());
@@ -275,6 +284,8 @@ public class Player extends DualAnimatedSprite {
 
 	private void postMegaRelease() {
 		GameSystem.getInstance().getLevelScreen().megaRelease();
+		jump(false);
+		velocityX = -15;
 		postMega = false;
 	}
 

@@ -96,6 +96,7 @@ public class GameSystem implements Runnable {
 			public void run(){
 				CutscenesManager.getInstance();
 				startScreen.loadScreen();
+				SoundManager.getInstance().playSound("title", true);
 				helpScreen.loadScreen();
 				selectScreen.loadScreen();
 			}
@@ -116,6 +117,8 @@ public class GameSystem implements Runnable {
 				break;
 			case LEVEL_1_START:
 				levelScreen.loadScreen();
+				SoundManager.getInstance().stopAll();
+				SoundManager.getInstance().playSound("xfiles", true);
 				break;
 			case LEVEL_1:
 				lastLevel = LEVEL_1;
@@ -123,6 +126,8 @@ public class GameSystem implements Runnable {
 				break;
 			case LEVEL_2_START:
 				level2Screen.loadScreen();
+				SoundManager.getInstance().stopAll();
+				SoundManager.getInstance().playSound("space", true);
 				break;
 			case LEVEL_2:
 				lastLevel = LEVEL_2;
