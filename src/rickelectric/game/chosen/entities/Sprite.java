@@ -23,6 +23,7 @@ public class Sprite extends Entity {
 		this.width = image.getWidth(null);
 		this.height = image.getHeight(null);
 		this.opacity = 1.0f;
+		this.boundingRect.setFrame(x, y, width, height);
 
 	}
 

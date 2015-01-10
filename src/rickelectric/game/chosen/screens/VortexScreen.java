@@ -157,4 +157,8 @@ public class VortexScreen implements GameScreen, ImageObserver {
 		center.setLocation(x, y);
 	}
 
+	@Override
+	public void refreshSize() {
+	}
+
 }

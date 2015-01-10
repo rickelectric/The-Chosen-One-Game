@@ -1,9 +1,11 @@
 package rickelectric.game.chosen;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
@@ -15,6 +17,8 @@ public class GameFrame extends JFrame {
 	private Component area;
 	private Canvas canvas;
 
+	private JPanel contentPane;
+
 	/**
 	 * Constructor
 	 * 
@@ -22,21 +26,47 @@ public class GameFrame extends JFrame {
 	 */
 	public GameFrame(String windowTitle) {
 		super(windowTitle);
+		setUndecorated(true);
+		setAlwaysOnTop(true);
+		
+		addWindowFocusListener(new WindowFocusListener(){
 
-		JPanel panel = (JPanel) getContentPane();
-		panel.setPreferredSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
+			@Override
+			public void windowGainedFocus(WindowEvent e) {
+				setState(NORMAL);
+				setSize(Toolkit.getDefaultToolkit().getScreenSize());
+				contentPane.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
+				area.setSize(contentPane.getPreferredSize());
+				GameSystem.getInstance().resumeGame();
+			}
 
-		panel.setLayout(null);
+			@Override
+			public void windowLostFocus(WindowEvent e) {
+				setState(ICONIFIED);
+				GameSystem.getInstance().suspendGame();
+			}
+			
+		});
+		setBackground(Color.black);
+		
+		contentPane = new JPanel();
+		contentPane.setBackground(getBackground());
+		setContentPane(contentPane);
+		contentPane.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
+
+		contentPane.setLayout(null);
 		//setBounds(0, 0, Globals.SCREEN_WIDTH, Globals.SCREEN_HEIGHT);
-		setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+		setSize(Toolkit.getDefaultToolkit().getScreenSize());
+		
 
 		canvas = new Canvas();
 		area = canvas;
-		area.setSize(panel.getPreferredSize());
-		panel.add(area);
+		area.setSize(contentPane.getPreferredSize());
+		contentPane.add(area);
 
 		setIgnoreRepaint(true);
 		pack();
+		setLocationRelativeTo(null);
 		setVisible(true);
 
 		canvas.createBufferStrategy(2);

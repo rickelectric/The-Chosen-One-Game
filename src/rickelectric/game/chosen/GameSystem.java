@@ -3,6 +3,8 @@ package rickelectric.game.chosen;
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 
+import javax.swing.JFrame;
+
 import rickelectric.game.chosen.entities.PlayerID;
 import rickelectric.game.chosen.level.LevelScreen_1;
 import rickelectric.game.chosen.level.LevelScreen_2;
@@ -14,8 +16,9 @@ import rickelectric.game.chosen.screens.LoadingScreen;
 import rickelectric.game.chosen.screens.SelectScreen;
 import rickelectric.game.chosen.screens.StartScreen;
 import rickelectric.game.chosen.screens.VortexScreen;
+import rickelectric.game.chosen.sounds.SoundManager;
 
-public class GameSystem implements Runnable {
+public class GameSystem extends Thread {
 
 	private static GameSystem gameSystem;
 
@@ -92,8 +95,8 @@ public class GameSystem implements Runnable {
 	public void run() {
 		BufferStrategy bs = gameFrame.getBufferStrategy();
 		changeScreen(LOADING_SCREEN);
-		new Thread(new Runnable(){
-			public void run(){
+		new Thread(new Runnable() {
+			public void run() {
 				CutscenesManager.getInstance();
 				startScreen.loadScreen();
 				helpScreen.loadScreen();
@@ -141,7 +144,7 @@ public class GameSystem implements Runnable {
 			try {
 				Thread.sleep(15);
 			} catch (InterruptedException e) {
-				System.out.println(e.getMessage());
+				bs = gameFrame.getBufferStrategy();
 			}
 		}
 
@@ -219,16 +222,22 @@ public class GameSystem implements Runnable {
 	}
 
 	public void changeScreen(int screenID) {
+		int prevScreen = screen;
 		screen = screenID;
 		switchTime = System.currentTimeMillis();
-		soundOff();
+		if (prevScreen == CUTSCENE)
+			soundResume();
+		else
+			soundOff();
 	}
 
-	private void soundOff() {
+	public void soundOff() {
 		SoundManager.getInstance().stopAll();
+		if (gameFrame.getState() == JFrame.ICONIFIED)
+			return;
 		switch (screen) {
 		case START_SCREEN:
-			SoundManager.getInstance().playSound("title", true);
+			SoundManager.getInstance().playSound("entralink", true);
 			break;
 		case SELECT_PLAYER:
 			SoundManager.getInstance().playSound("theme", true);
@@ -237,15 +246,50 @@ public class GameSystem implements Runnable {
 			SoundManager.getInstance().playSound("title", true);
 			break;
 		case LEVEL_1:
-			SoundManager.getInstance().playSound("xfiles", true);
+			SoundManager.getInstance().playSound("level1", true);
 			break;
 		case LEVEL_2:
-			SoundManager.getInstance().playSound("space", true);
+			SoundManager.getInstance().playSound("level2", true);
 			break;
 		case CUTSCENE:
 			break;
 		case VORTEX:
 			SoundManager.getInstance().playSound("vortex", true);
+			break;
+		case GAME_OVER:
+			break;
+		}
+	}
+
+	public void soundResume() {
+		SoundManager.getInstance().stopAll();
+		if (gameFrame.getState() == JFrame.ICONIFIED
+				|| (getLevelScreen() != null && getLevelScreen().isPaused()))
+			return;
+		switch (screen) {
+		case START_SCREEN:
+			SoundManager.getInstance().resumeSound("entralink", true);
+			break;
+		case SELECT_PLAYER:
+			SoundManager.getInstance().resumeSound("theme", true);
+			break;
+		case HELP_SCREEN:
+			SoundManager.getInstance().resumeSound("title", true);
+			break;
+		case LEVEL_1:
+			if (!levelScreen.isPaused()) {
+				SoundManager.getInstance().resumeSound("level1", true);
+			}
+			break;
+		case LEVEL_2:
+			if (!level2Screen.isPaused()) {
+				SoundManager.getInstance().resumeSound("level2", true);
+			}
+			break;
+		case CUTSCENE:
+			break;
+		case VORTEX:
+			SoundManager.getInstance().resumeSound("vortex", true);
 			break;
 		case GAME_OVER:
 			break;
@@ -283,6 +327,32 @@ public class GameSystem implements Runnable {
 
 	public PlayerID getPlayerID() {
 		return this.levelScreen.getPlayerID();
+	}
+
+	public void refreshSize() {
+		Globals.SCREEN_WIDTH = gameFrame.getArea().getWidth();
+		Globals.SCREEN_HEIGHT = gameFrame.getArea().getHeight();
+		if (gameSystem == null)
+			return;
+		startScreen.refreshSize();
+		helpScreen.refreshSize();
+		selectScreen.refreshSize();
+		levelScreen.refreshSize();
+		level2Screen.refreshSize();
+		vortexScreen.refreshSize();
+		gameOverScreen.refreshSize();
+	}
+
+	public void resumeGame() {
+		refreshSize();
+		soundResume();
+	}
+
+	public void suspendGame() {
+		SoundManager.getInstance().suspend();
+		if (getLevelScreen() != null) {
+			getLevelScreen().setPaused(true);
+		}
 	}
 
 }

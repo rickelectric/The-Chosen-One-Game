@@ -19,6 +19,6 @@ public class Globals
 	public static int WORLD_HEIGHT = 2000; 
 	
 	//game map 
-	public static LevelMap MAP; 
+	public static LevelMap MAP;
 
 }

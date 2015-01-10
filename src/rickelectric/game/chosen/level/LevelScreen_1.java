@@ -16,7 +16,7 @@ import rickelectric.game.chosen.entities.CatEyes;
 import rickelectric.game.chosen.entities.Coin;
 import rickelectric.game.chosen.entities.PlayerID;
 import rickelectric.game.chosen.entities.Portal;
-import rickelectric.game.chosen.entities.SparkBall;
+import rickelectric.game.chosen.entities.attacks.SparkBall;
 import rickelectric.game.chosen.entities.enemies.Dragon;
 import rickelectric.game.chosen.entities.enemies.LightningDragon;
 import rickelectric.game.chosen.entities.enemies.MiniDragon;
@@ -360,7 +360,7 @@ public class LevelScreen_1 extends LevelScreen {
 		}
 
 		background.update();
-		camera.updateCamera();
+		camera.updateCamera(this.unfreezeCamera());
 		getPlayer().update();
 
 		if (getPlayer().getY() > Globals.WORLD_HEIGHT) {

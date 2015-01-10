@@ -1,4 +1,5 @@
 package rickelectric.game.chosen;
+
 import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
@@ -13,103 +14,106 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
+public class AssetManager {
+	private static AssetManager assets;
 
-public class AssetManager 
-{
-	private static AssetManager assets; 
-	
-	//Remember to store images in a data structure 
-	private HashMap<String,Image> tilesets; 
-	private HashMap<String,Image> loadedImages;
+	// Remember to store images in a data structure
+	private HashMap<String, Image> tilesets;
+	private HashMap<String, Image> loadedImages;
 
 	private Font font;
-	
-	private AssetManager()
-	{
-		loadAssets(); 
+
+	private AssetManager() {
+		loadAssets();
 	}
-	
-	public synchronized static AssetManager getInstance()
-	{
+
+	public synchronized static AssetManager getInstance() {
 		if (assets == null)
-			assets = new AssetManager(); 
-		return assets; 
+			assets = new AssetManager();
+		return assets;
 	}
-	
-	private void loadAssets()
-	{
-		tilesets = new HashMap<String,Image>();
-		tilesets.put("walls.png",loadImage("images/walls.png"));
-		tilesets.put("slopes.png",loadImage("images/slopes.png"));
-		tilesets.put("other.png",loadImage("images/other.png"));
-		tilesets.put("totemWalkways.png",loadImage("images/totemWalkways.png"));
-		tilesets.put("Water1.png",loadImage("images/Water1.png"));
-		tilesets.put("Water2.png",loadImage("images/Water2.png"));
-		tilesets.put("WaterInWall.png",loadImage("images/WaterInWall.png"));
-		tilesets.put("level2/WallCornersAlien.png",loadImage("images/level2/WallCornersAlien.png"));
-		tilesets.put("level2/WallsAlien.png",loadImage("images/level2/WallsAlien.png"));
-		
-		loadedImages = new HashMap<String,Image>();
-		
+
+	private void loadAssets() {
+		tilesets = new HashMap<String, Image>();
+		tilesets.put("walls.png", loadImage("images/walls.png"));
+		tilesets.put("slopes.png", loadImage("images/slopes.png"));
+		tilesets.put("other.png", loadImage("images/other.png"));
+		tilesets.put("totemWalkways.png", loadImage("images/totemWalkways.png"));
+		tilesets.put("Water1.png", loadImage("images/Water1.png"));
+		tilesets.put("Water2.png", loadImage("images/Water2.png"));
+		tilesets.put("WaterInWall.png", loadImage("images/WaterInWall.png"));
+		tilesets.put("level2/WallCornersAlien.png",
+				loadImage("images/level2/WallCornersAlien.png"));
+		tilesets.put("level2/WallsAlien.png",
+				loadImage("images/level2/WallsAlien.png"));
+
+		loadedImages = new HashMap<String, Image>();
+
 		getFont();
 	}
-	
+
 	/**
-	 * Retrieves an image from disk 
+	 * Retrieves an image from disk
+	 * 
 	 * @param ref
 	 * @return
 	 */
-	private Image loadImage(String ref) 
-	{ 	
-	   	Image tempImage = null; 
+	private Image loadImage(String ref) {
+		Image tempImage = null;
 		BufferedImage sourceImage = null;
-			
-		try {			
+
+		try {
 			URL url = this.getClass().getResource(ref);
-				
+
 			if (url == null) {
-				System.out.println("Can't find ref: "+ref);
-			}			
+				System.out.println("Can't find ref: " + ref);
+			}
 			sourceImage = ImageIO.read(url);
-	                       
-		} 
-		catch (IOException e) {
-			System.out.println("Failed to load: "+ref);
+
+		} catch (IOException e) {
+			System.out.println("Failed to load: " + ref);
 		}
-			
-	    //creates an accelerated image
-		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-		tempImage = gc.createCompatibleImage(sourceImage.getWidth(),sourceImage.getHeight(),Transparency.TRANSLUCENT);
-			
-		// draw source image into the accelerated image
-		tempImage.getGraphics().drawImage(sourceImage,0,0,null);
-		
-		return tempImage; 
-			
+
+		try {
+			// creates an accelerated image
+			GraphicsConfiguration gc = GraphicsEnvironment
+					.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+					.getDefaultConfiguration();
+			tempImage = gc.createCompatibleImage(sourceImage.getWidth(),
+					sourceImage.getHeight(), Transparency.TRANSLUCENT);
+
+			// draw source image into the accelerated image
+			tempImage.getGraphics().drawImage(sourceImage, 0, 0, null);
+		} catch (Exception e) {
+			return sourceImage;
+		}
+
+		return tempImage;
+
 	}
 
-	// Remember to have a method for accessing our 
-	// data structure that we are using to store 
-	// assets in 
+	// Remember to have a method for accessing our
+	// data structure that we are using to store
+	// assets in
 	public Image getTileset(String tilesetName) {
 		return tilesets.get(tilesetName);
 	}
 
 	public Image getImage(String imageExtName) {
 		Image img = loadedImages.get(imageExtName);
-		if(img==null){
-			img = loadImage("images/"+imageExtName);
+		if (img == null) {
+			img = loadImage("images/" + imageExtName);
 			loadedImages.put(imageExtName, img);
 		}
 		return img;
 	}
 
 	public Font getFont() {
-		if(font==null){
+		if (font == null) {
 			try {
 				URL fontUrl = getClass().getResource("fonts/font1.ttf");
-				font = Font.createFont(Font.TRUETYPE_FONT,
-						fontUrl.openStream());
+				font = Font
+						.createFont(Font.TRUETYPE_FONT, fontUrl.openStream());
 			} catch (Exception e) {
 				e.printStackTrace();
 				font = new Font(Font.DIALOG, Font.BOLD, 40);
@@ -132,7 +136,5 @@ public class AssetManager
 		reader.close();
 		return stringBuilder.toString();
 	}
-	
-	
 
 }

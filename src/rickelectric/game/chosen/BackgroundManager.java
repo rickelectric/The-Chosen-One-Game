@@ -11,7 +11,7 @@ public class BackgroundManager {
 	public float speedMultiplier;
 	
 	public BackgroundManager(GameSystem game,int levelNo){
-		if(levelNo==1){
+		if(levelNo==2){
 			backgrounds = new ParallaxBackground[5];
 			relativeSpeed = new float[5];
 			backgrounds[0] = new ParallaxBackground(game,"level1/Layer1_Sky",0);
@@ -66,8 +66,9 @@ public class BackgroundManager {
 	}
 
 	public void reset() {
-		setSpeed(50);
+		//setSpeed(50);
 		for(int i=0;i<backgrounds.length;i++){
+			backgrounds[i].setSpeed(0);
 			backgrounds[i].reset();
 		}
 	}

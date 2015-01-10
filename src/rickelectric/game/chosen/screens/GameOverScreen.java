@@ -47,4 +47,10 @@ public class GameOverScreen implements GameScreen {
 	public void loadScreen() {
 
 	}
+
+	@Override
+	public void refreshSize() {
+		// TODO Auto-generated method stub
+		
+	}
 }

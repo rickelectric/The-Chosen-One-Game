@@ -19,4 +19,6 @@ public interface GameScreen {
 	 */
 	public void loadScreen();
 
+	public void refreshSize();
+
 }

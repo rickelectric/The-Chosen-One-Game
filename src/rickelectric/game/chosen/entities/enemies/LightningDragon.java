@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 
 import rickelectric.game.chosen.GameSystem;
 import rickelectric.game.chosen.entities.DualAnimatedSprite;
-import rickelectric.game.chosen.entities.Lightning;
+import rickelectric.game.chosen.entities.attacks.Lightning;
 
 public class LightningDragon extends DualAnimatedSprite implements Dragon {
 
@@ -50,11 +50,11 @@ public class LightningDragon extends DualAnimatedSprite implements Dragon {
 
 		if (activeImage == 1) {
 			dragonBolt.setX(boundingRect.x + boundingRect.width - 5);
-			dragonBolt.setDirection(1);
+			dragonBolt.setDirection(Lightning.DIRECTION_RIGHT);
 			dragonBolt.update();
 		} else {
 			dragonBolt.setX(boundingRect.x);
-			dragonBolt.setDirection(-1);
+			dragonBolt.setDirection(Lightning.DIRECTION_LEFT);
 			dragonBolt.update();
 		}
 		if (GameSystem.getInstance().getLevelScreen().getPlayer()

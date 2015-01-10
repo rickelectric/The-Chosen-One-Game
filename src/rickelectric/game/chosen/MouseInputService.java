@@ -1,6 +1,5 @@
 package rickelectric.game.chosen;
 
-
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -13,16 +12,16 @@ public class MouseInputService implements MouseListener, MouseMotionListener {
 	private float dragMouseY;
 
 	private boolean mouseButtonL, mouseButtonR, mouseIn;
-	
-	public boolean buttonL(){
+
+	public boolean buttonL() {
 		return mouseButtonL;
 	}
-	
-	public boolean buttonR(){
+
+	public boolean buttonR() {
 		return mouseButtonR;
 	}
-	
-	public boolean mouseIn(){
+
+	public boolean mouseIn() {
 		return mouseIn;
 	}
 
@@ -52,6 +51,12 @@ public class MouseInputService implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+			if (e.getX() < 20 && e.getY() < 20) {
+				//Fullcreen
+				//GameSystem.getInstance().fullscreen();
+			}
+		}
 	}
 
 	@Override
@@ -66,30 +71,30 @@ public class MouseInputService implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		switch(e.getButton()){
-			case MouseEvent.BUTTON1:
-				mouseButtonL = true;
-				mouseX = dragMouseX = e.getX();
-				mouseY = dragMouseY = e.getY();
-				break;
-			case MouseEvent.BUTTON3:
-				mouseButtonR = true;
-				mouseX = dragMouseX = e.getX();
-				mouseY = dragMouseY = e.getY();
-				break;
+		switch (e.getButton()) {
+		case MouseEvent.BUTTON1:
+			mouseButtonL = true;
+			mouseX = dragMouseX = e.getX();
+			mouseY = dragMouseY = e.getY();
+			break;
+		case MouseEvent.BUTTON3:
+			mouseButtonR = true;
+			mouseX = dragMouseX = e.getX();
+			mouseY = dragMouseY = e.getY();
+			break;
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		switch(e.getButton()){
+		switch (e.getButton()) {
 		case MouseEvent.BUTTON1:
 			mouseButtonL = false;
 			break;
 		case MouseEvent.BUTTON3:
 			mouseButtonR = false;
 			break;
-	}
+		}
 	}
 
 	public float getMouseX() {

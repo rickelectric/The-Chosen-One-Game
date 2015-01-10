@@ -9,6 +9,6 @@ public class RunGame
 		GameSystem game = GameSystem.getInstance(); 
 		
 		//run game 
-		game.run();
+		game.start();
 	}
 }

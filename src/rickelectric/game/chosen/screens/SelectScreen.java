@@ -17,6 +17,7 @@ import rickelectric.game.chosen.entities.DualSprite;
 import rickelectric.game.chosen.entities.ParallaxBackground;
 import rickelectric.game.chosen.entities.PlayerID;
 import rickelectric.game.chosen.entities.Sprite;
+import rickelectric.game.chosen.sounds.SoundManager;
 
 public class SelectScreen implements GameScreen {
 
@@ -90,6 +91,8 @@ public class SelectScreen implements GameScreen {
 					selY = 2;
 					selX = selX % 2;
 				}
+				SoundManager.getInstance().stopSound("select");
+				SoundManager.getInstance().playSound("select", false);
 				lp = System.currentTimeMillis();
 			}
 		} else if (KeyboardInputService.getInstance().isDown()) {
@@ -99,6 +102,8 @@ public class SelectScreen implements GameScreen {
 				if (selY == 2) {
 					selX = selX % 2;
 				}
+				SoundManager.getInstance().stopSound("select");
+				SoundManager.getInstance().playSound("select", false);
 				lp = System.currentTimeMillis();
 			}
 		}
@@ -111,6 +116,8 @@ public class SelectScreen implements GameScreen {
 					else
 						selX = 3;
 				}
+				SoundManager.getInstance().stopSound("select");
+				SoundManager.getInstance().playSound("select", false);
 				lp = System.currentTimeMillis();
 			}
 		}
@@ -118,21 +125,32 @@ public class SelectScreen implements GameScreen {
 			if (System.currentTimeMillis() - lp > 200) {
 				selX++;
 				selX %= selY == 2 ? 2 : 4;
+				SoundManager.getInstance().stopSound("select");
+				SoundManager.getInstance().playSound("select", false);
 				lp = System.currentTimeMillis();
 			}
+
 		}
 
 		MouseInputService mis = MouseInputService.getInstance();
 		Point2D p = new Point2D.Float(mis.getMouseX(), mis.getMouseY());
 		if (back.getBoundingRect().contains(p)) {
-			selX = 0;
-			selY = 2;
+			if(selX!=0 || selY!=2){
+				selX = 0;
+				selY = 2;
+				SoundManager.getInstance().stopSound("select");
+				SoundManager.getInstance().playSound("select",false);
+			}
 			if (mis.buttonL())
 				invokeButtonAction(false);
 		}
 		if (begin.getBoundingRect().contains(p)) {
+			if(selX!=1 || selY!=2){
 			selX = 1;
 			selY = 2;
+			SoundManager.getInstance().stopSound("select");
+			SoundManager.getInstance().playSound("select",false);
+			}
 			if (mis.buttonL())
 				invokeButtonAction(false);
 		}
@@ -140,8 +158,12 @@ public class SelectScreen implements GameScreen {
 			for (int j = 0; j < players[i].length; j++) {
 				Rectangle2D r = playerRects[i][j];
 				if (r.getBounds().contains(p)) {
-					selX = j;
-					selY = i;
+					if(selX!=j || selY!=i){
+						selX = j;
+						selY = i;
+						SoundManager.getInstance().stopSound("select");
+						SoundManager.getInstance().playSound("select",false);
+					}
 					if (mis.buttonL())
 						invokeButtonAction(false);
 					break outer;
@@ -162,23 +184,29 @@ public class SelectScreen implements GameScreen {
 
 	private void invokeButtonAction(boolean cutscene) {
 		if (selY == 2) {
-			if (selX == 0)
+			SoundManager.getInstance().stopSound("select");
+			SoundManager.getInstance().playSound("select",false);
+			if (selX == 0){
 				GameSystem.getInstance().changeScreen(GameSystem.START_SCREEN);
-			else
+			}
+			else{
 				GameSystem
 						.getInstance()
 						.changeScreen(
 								KeyboardInputService.getInstance().is2() ? GameSystem.LEVEL_2_START
-										: GameSystem.LEVEL_1_START);
+											: GameSystem.LEVEL_1_START);
+			}
 		} else {
 			selectedPlayer = ids[selY][selX];
-			if (GameSystem.getInstance().getPlayerID() == selectedPlayer){
-				if(cutscene){
-					CutscenesManager.getInstance().playScene(selectedPlayer, GameSystem.SELECT_PLAYER);
+			if (GameSystem.getInstance().getPlayerID() == selectedPlayer) {
+				if (cutscene) {
 					GameSystem.getInstance().changeScreen(GameSystem.CUTSCENE);
 				}
 				return;
 			}
+			SoundManager.getInstance().playSound("select", false);
+			CutscenesManager.getInstance().playScene(selectedPlayer,
+					GameSystem.SELECT_PLAYER);
 			GameSystem.getInstance().setPlayer(selectedPlayer);
 		}
 	}
@@ -282,6 +310,10 @@ public class SelectScreen implements GameScreen {
 
 	public PlayerID getSelectedPlayer() {
 		return selectedPlayer;
+	}
+	
+	public void refreshSize() {
+		
 	}
 
 }

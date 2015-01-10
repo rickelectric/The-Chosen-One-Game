@@ -13,11 +13,10 @@ import rickelectric.game.chosen.GameSystem;
 import rickelectric.game.chosen.Globals;
 import rickelectric.game.chosen.KeyboardInputService;
 import rickelectric.game.chosen.entities.CatEyes;
-import rickelectric.game.chosen.entities.DualSprite;
 import rickelectric.game.chosen.entities.Key;
 import rickelectric.game.chosen.entities.PlayerID;
 import rickelectric.game.chosen.entities.Portal;
-import rickelectric.game.chosen.entities.SparkBall;
+import rickelectric.game.chosen.entities.attacks.SparkBall;
 import rickelectric.game.chosen.entities.enemies.Dragon;
 import rickelectric.game.chosen.entities.enemies.LightningDragon;
 import rickelectric.game.chosen.entities.enemies.MiniDragon;
@@ -47,7 +46,6 @@ public class LevelScreen_2 extends LevelScreen {
 
 	private String mapName;
 
-	private DualSprite resume, endgame;
 	private String levelName;
 	private boolean levelEnding = false;
 
@@ -138,12 +136,7 @@ public class LevelScreen_2 extends LevelScreen {
 				getDragons().add(d);
 				LoadingScreen.getInstance().setPercent(70);
 
-				int centerX = Globals.SCREEN_WIDTH / 2;
-				resume = new DualSprite("Buttons/ResumeActive",
-						"Buttons/ResumeInactive", centerX - 105, 100, 0.7f);
-				endgame = new DualSprite("Buttons/QuitLevelActive",
-						"Buttons/QuitLevelInactive", centerX - 105, 160, 0.7f);
-				endgame.setActiveImage(2);
+				createControls();
 				LoadingScreen.getInstance().setPercent(90);
 
 				// Follow Player
@@ -276,8 +269,7 @@ public class LevelScreen_2 extends LevelScreen {
 		int centerY = Globals.SCREEN_HEIGHT / 2 - +30;
 		g2d.drawString(str, centerX, centerY);
 
-		resume.draw(g2d);
-		endgame.draw(g2d);
+		drawControls(g2d);
 	}
 
 	private void drawIntro(Graphics2D g2d) {
@@ -363,7 +355,7 @@ public class LevelScreen_2 extends LevelScreen {
 		}
 
 		background.update();
-		camera.updateCamera();
+		camera.updateCamera(true);
 		getPlayer().update();
 
 		if (getPlayer().getY() > Globals.WORLD_HEIGHT) {

@@ -12,21 +12,24 @@ import rickelectric.game.chosen.BackgroundManager;
 import rickelectric.game.chosen.GameSystem;
 import rickelectric.game.chosen.Globals;
 import rickelectric.game.chosen.KeyboardInputService;
-import rickelectric.game.chosen.entities.BulletPool;
+import rickelectric.game.chosen.MouseInputService;
 import rickelectric.game.chosen.entities.DualSprite;
 import rickelectric.game.chosen.entities.Entity;
 import rickelectric.game.chosen.entities.Player;
 import rickelectric.game.chosen.entities.PlayerID;
-import rickelectric.game.chosen.entities.SparkBall;
+import rickelectric.game.chosen.entities.Sprite;
+import rickelectric.game.chosen.entities.attacks.SparkBall;
+import rickelectric.game.chosen.entities.attacks.SparkPool;
 import rickelectric.game.chosen.entities.enemies.Dragon;
 import rickelectric.game.chosen.level.Camera;
 import rickelectric.game.chosen.level.tilemap.Tile;
+import rickelectric.game.chosen.sounds.SoundManager;
 
 public abstract class LevelScreen implements GameScreen {
 
 	private ArrayList<SparkBall> sparkBalls;
 	private ArrayList<Dragon> dragons;
-	
+
 	private DualSprite resume, endgame;
 
 	private int lives;
@@ -38,17 +41,21 @@ public abstract class LevelScreen implements GameScreen {
 	private boolean paused;
 	private long keyDelay;
 	private long pauseDelay;
+	private Sprite rnBtn;
+	private boolean camFreeze;
+	private int cpd;
 
 	public LevelScreen(PlayerID playerID) {
 		this.playerID = playerID;
-		
+
 		dragons = new ArrayList<Dragon>();
 		sparkBalls = new ArrayList<SparkBall>();
 		removal = new ArrayList<SparkBall>();
-		
+
 		lives = 3;
 		hp = 200;
 		numCollectables = 0;
+		cpd=0;
 	}
 
 	public void lifeLost() {
@@ -56,6 +63,9 @@ public abstract class LevelScreen implements GameScreen {
 			sendNotify("You Died");
 			player.setX(385);
 			player.setY(2432);
+			player.update();
+			freezeNextCameraUpdate();
+			getCamera().updateCamera(false);
 			lives--;
 			hp = 200;
 		} else {
@@ -63,6 +73,17 @@ public abstract class LevelScreen implements GameScreen {
 			GameSystem.getInstance().changeScreen(GameSystem.GAME_OVER);
 		}
 		getBackground().reset();
+	}
+
+	public void freezeNextCameraUpdate() {
+		cpd=0;
+		this.camFreeze=true;
+	}
+	
+	public boolean unfreezeCamera(){
+		boolean tcf = this.camFreeze==true;
+		if(cpd++>2)this.camFreeze=false;
+		return tcf;
 	}
 
 	public abstract void sendNotify(String text);
@@ -82,8 +103,8 @@ public abstract class LevelScreen implements GameScreen {
 			lifeLost();
 		}
 	}
-	
-	public void updatePause(){
+
+	public void updatePause() {
 		if (paused) {
 			if (KeyboardInputService.getInstance().isUp()
 					|| KeyboardInputService.getInstance().isDown()) {
@@ -93,18 +114,47 @@ public abstract class LevelScreen implements GameScreen {
 					keyDelay = System.currentTimeMillis();
 				}
 			}
-		}
 
-		if (KeyboardInputService.getInstance().isEnter()
-				&& System.currentTimeMillis() - pauseDelay > 200) {
-			if (System.currentTimeMillis() - keyDelay > 200) {
-				if (resume.getActiveImage() == 1) {
+			if (KeyboardInputService.getInstance().isEnter()
+					&& System.currentTimeMillis() - pauseDelay > 200) {
+				if (System.currentTimeMillis() - keyDelay > 200) {
+					if (resume.getActiveImage() == 1) {
+						pause();
+						pauseDelay = keyDelay = System.currentTimeMillis();
+					} else {
+						GameSystem.getInstance().changeScreen(
+								GameSystem.START_SCREEN);
+					}
+				}
+			}
+
+			if (resume.getBoundingRect().contains(
+					MouseInputService.getInstance().getMouseX(),
+					MouseInputService.getInstance().getMouseY())) {
+				resume.setActiveImage(1);
+				endgame.setActiveImage(2);
+				if (MouseInputService.getInstance().buttonL()) {
 					pause();
 					pauseDelay = keyDelay = System.currentTimeMillis();
-				} else {
+				}
+			}
+			if (endgame.getBoundingRect().contains(
+					MouseInputService.getInstance().getMouseX(),
+					MouseInputService.getInstance().getMouseY())) {
+				endgame.setActiveImage(1);
+				resume.setActiveImage(2);
+				if (MouseInputService.getInstance().buttonL()) {
 					GameSystem.getInstance().changeScreen(
 							GameSystem.START_SCREEN);
 				}
+			}
+		}
+		
+		if(rnBtn.getBoundingRect().contains(MouseInputService.getInstance().getMouseX(),
+				MouseInputService.getInstance().getMouseY())){
+			if(MouseInputService.getInstance().buttonL() && !paused){
+				pause();
+				pauseDelay = keyDelay = System.currentTimeMillis();
 			}
 		}
 
@@ -114,26 +164,27 @@ public abstract class LevelScreen implements GameScreen {
 			pauseDelay = System.currentTimeMillis();
 		}
 	}
-	
+
 	private void pause() {
 		paused = !paused;
 		if (paused) {
-			// SoundManager.getInstance().stopAll();
+			SoundManager.getInstance().stopAll();
 		} else {
-			// SoundManager.getInstance().playSound("xfiles", true);
+			GameSystem.getInstance().soundResume();
 		}
 	}
 
-	public void createControls(){
+	public void createControls() {
 		int centerX = Globals.SCREEN_WIDTH / 2;
 		resume = new DualSprite("Buttons/ResumeActive",
 				"Buttons/ResumeInactive", centerX - 105, 100, 0.7f);
 		endgame = new DualSprite("Buttons/QuitLevelActive",
 				"Buttons/QuitLevelInactive", centerX - 105, 160, 0.7f);
 		endgame.setActiveImage(2);
+		rnBtn = new Sprite("RickNewBtn",Globals.SCREEN_WIDTH-70,Globals.SCREEN_HEIGHT-70);
 	}
-	
-	public void drawControls(Graphics2D g2d){
+
+	public void drawControls(Graphics2D g2d) {
 		resume.draw(g2d);
 		endgame.draw(g2d);
 	}
@@ -148,7 +199,8 @@ public abstract class LevelScreen implements GameScreen {
 
 		// Initialize 20 Bullets To Pool To Increase Speed In Game.
 		for (int i = 0; i < 20; i++)
-			BulletPool.getInstance().addReusable(new SparkBall(null, 0, 0, 0, 0));
+			SparkPool.getInstance().addReusable(
+					new SparkBall(null, 0, 0, 0, 0));
 	}
 
 	protected ArrayList<SparkBall> getBullets() {
@@ -160,19 +212,14 @@ public abstract class LevelScreen implements GameScreen {
 		float y = entity.getY() + entity.getHeight() / 10;
 
 		/**
-		 * If Entity Is WaterDragon, Shoot Water-Plasma Ball.
-		 * If Entity Is MiniDragon, Shoot Small FireBall
-		 * If Entity Is Player:
-		 * 	>If Fire Queen - Shoot FireBall
-		 * 	>If Ice Princess - Shoot SnowBall
-		 * 	>If Time-Lord - Shoot SparkBall
-		 * 	>If Space-Lord - Shoot White EnergyBall
-		 * 	>If Tribrid - Shoot DarkBall
-		 * 	>If Ghost - Shoot Yellow LightBall
-		 * 	>If Sailor - Shoot Gold Bullet
-		 * 	>If Cyber Raider - Shoot Hot Metal Bullets
+		 * If Entity Is WaterDragon, Shoot Water-Plasma Ball. If Entity Is
+		 * MiniDragon, Shoot Small FireBall If Entity Is Player: >If Fire Queen
+		 * - Shoot FireBall >If Ice Princess - Shoot SnowBall >If Time-Lord -
+		 * Shoot SparkBall >If Space-Lord - Shoot White EnergyBall >If Tribrid -
+		 * Shoot DarkBall >If Ghost - Shoot Yellow LightBall >If Sailor - Shoot
+		 * Gold Bullet >If Cyber Raider - Shoot Hot Metal Bullets
 		 */
-		SparkBall b = BulletPool.getInstance().aquireReusable();
+		SparkBall b = SparkPool.getInstance().aquireReusable();
 		if (b == null) {
 			b = new SparkBall(entity, x, y, angle, speed);
 		} else {
@@ -188,6 +235,8 @@ public abstract class LevelScreen implements GameScreen {
 	public abstract double getScaler();
 
 	public void drawStats(Graphics2D g2d, String collectable) {
+		rnBtn.draw(g2d);
+		
 		int lifeX = Globals.SCREEN_WIDTH - 240;
 		int lifeY = 20;
 
@@ -312,23 +361,24 @@ public abstract class LevelScreen implements GameScreen {
 	}
 
 	public void updateGhostAttack() {
-		if (ghostAttack != null){
+		if (ghostAttack != null) {
 			Iterator<Ellipse2D> g = ghostAttack.iterator();
-			ghost:while(g.hasNext()) {
+			ghost: while (g.hasNext()) {
 				Ellipse2D e = g.next();
 				e.setFrame(e.getX() + (40 * Math.random()), e.getY()
-						+ (30 * Math.random() - 15), e.getWidth(), e.getHeight());
+						+ (30 * Math.random() - 15), e.getWidth(),
+						e.getHeight());
 				Iterator<SparkBall> v = sparkBalls.iterator();
-				while(v.hasNext()){
-					SparkBall b= v.next();
-					if(e.intersects(b.getBoundingRect())){
+				while (v.hasNext()) {
+					SparkBall b = v.next();
+					if (e.intersects(b.getBoundingRect())) {
 						v.remove();
 						g.remove();
 						continue ghost;
 					}
 				}
-				for(Dragon d:getDragons()){
-					if(d.isVisible() && e.intersects(d.getBoundingRect())){
+				for (Dragon d : getDragons()) {
+					if (d.isVisible() && e.intersects(d.getBoundingRect())) {
 						d.attacked();
 						d.decreaseHP(20);
 						g.remove();
@@ -346,17 +396,17 @@ public abstract class LevelScreen implements GameScreen {
 				g2d.fill(e);
 			}
 	}
-	
-	public ArrayList<Dragon> getDragons(){
+
+	public ArrayList<Dragon> getDragons() {
 		return dragons;
 	}
 
 	public void reset() {
 		setPaused(false);
 		pauseDelay = System.currentTimeMillis();
-		
+
 	}
-	
+
 	public boolean isPaused() {
 		return paused;
 	}
@@ -364,31 +414,34 @@ public abstract class LevelScreen implements GameScreen {
 	public void setPaused(boolean paused) {
 		this.paused = paused;
 	}
-	
+
 	public abstract Camera getCamera();
 
 	public void updateBullets() {
 		for (SparkBall b : getBullets()) {
 			b.update();
 			if (b.getX() < getCamera().getCameraX()
-					|| b.getX() > getCamera().getCameraX() + Globals.SCREEN_WIDTH
-							/ getScaler()
+					|| b.getX() > getCamera().getCameraX()
+							+ Globals.SCREEN_WIDTH / getScaler()
 					|| b.getY() < getCamera().getCameraY()
-					|| b.getY() > getCamera().getCameraY() + Globals.SCREEN_HEIGHT
-							/ getScaler()) {
+					|| b.getY() > getCamera().getCameraY()
+							+ Globals.SCREEN_HEIGHT / getScaler()) {
 				removal.add(b);
 			} else if (getPlayer().getLightning().isVisible()
 					&& b.getBoundingRect().intersects(
 							getPlayer().getLightning().getBoundingRect())
 					&& !b.getSource().equals(getPlayer())) {
 				removal.add(b);
-			} else if (b.getBoundingRect().intersects(getPlayer().getBoundingRect())
+			} else if (b.getBoundingRect().intersects(
+					getPlayer().getBoundingRect())
 					&& !b.getSource().equals(getPlayer())) {
 				removal.add(b);
 				decreaseHP(15);
 			} else {
 				for (Dragon d : getDragons()) {
-					if (d.isVisible() && b.getBoundingRect().intersects(d.getBoundingRect())
+					if (d.isVisible()
+							&& b.getBoundingRect().intersects(
+									d.getBoundingRect())
 							&& b.getSource().equals(getPlayer())) {
 						d.attacked();
 						d.decreaseHP(20);
@@ -415,9 +468,14 @@ public abstract class LevelScreen implements GameScreen {
 		}
 
 		for (SparkBall b : removal) {
-			BulletPool.getInstance().addReusable(b);
+			SparkPool.getInstance().addReusable(b);
 			getBullets().remove(b);
 		}
 		removal.removeAll(removal);
+	}
+	
+	@Override
+	public void refreshSize() {
+		
 	}
 }

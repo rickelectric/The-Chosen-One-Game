@@ -23,32 +23,42 @@ public class HelpScreen implements GameScreen {
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, Globals.SCREEN_WIDTH, Globals.SCREEN_HEIGHT);
 		bg.draw(g2d);
+		
+		//g2d.setColor(Color.red);
+		
+		g2d.setFont(new Font(Font.DIALOG,Font.BOLD, 30));
+		g2d.drawString("Controls: ", 100, 95);
 		g2d.setFont(AssetManager.getInstance().getFont()
 				.deriveFont(Font.BOLD, 25));
-		// g2d.setColor(Color.white);
-		g2d.drawString("Controls: ", 100, 100);
+		
 		g2d.drawString("Left / Right: Move Left And Right", 120, 130);
 		g2d.drawString(
-				"Z: Shoot Lightning. Use Up And Down To Control Lightning.",
+				"Z: Short-Range Attack. Use Up/Down To Control Attack.",
 				120, 160);
-		g2d.drawString("X: Shoot Spark Balls", 120, 190);
+		g2d.drawString("X: Long-Range Attack", 120, 190);
 		g2d.drawString("Spacebar: Jump", 120, 220);
-		g2d.drawString("Escape: Pause Menu, Resume", 120, 250);
+		g2d.drawString("Down - A: Supercharge Energy", 120, 250);
+		g2d.drawString("Up - A: Use Mega Attack / Special Ability", 120, 280);
+		g2d.drawString("Escape: Pause Menu, Resume", 120, 310);
 
-		g2d.drawString("Objectives: ", 100, 300);
-		g2d.drawString("1. Find And Shoot Lightning At The Eyes.", 120, 330);
-		g2d.drawString("- They Reveal Hidden Paths", 180, 360);
-		g2d.drawString("- One Of Them Opens The Portal", 180, 390);
+		g2d.setFont(new Font(Font.DIALOG,Font.BOLD, 30));
+		g2d.drawString("Objectives: ", 100, 355);
+		
+		g2d.setFont(AssetManager.getInstance().getFont()
+				.deriveFont(Font.BOLD, 25));
+		g2d.drawString("1. Find And Shoot Lightning At The Eyes.", 120, 390);
+		g2d.drawString("- They Reveal Hidden Paths", 180, 420);
+		g2d.drawString("- One Of Them Opens The Portal", 180, 450);
 		g2d.drawString(
-				"2. Find And Slay The Dragon. Lightning Is Most Effective.",
-				120, 420);
-		g2d.drawString("3. You Only Have 3 Lives. So, Avoid Dying.", 120, 450);
-		g2d.drawString("4. Totem Poles Shoot Sparks At You. Avoid.", 120, 480);
+				"2. Find And Slay All Dragons. Different Attacks Are Effective Against Different Dragons.",
+				120, 480);
+		g2d.drawString("3. You Only Have 3 Lives. So, Avoid Dying.", 120, 510);
+		g2d.drawString("4. Totem Poles Shoot Sparks At You. Avoid.", 120, 540);
 		g2d.drawString("-You May Also Use Your Lightning To Destroy Sparks.",
-				180, 510);
+				180, 570);
 		g2d.drawString(
 				"5. Find The Portal And Use It To Slide Off The Planet.", 120,
-				540);
+				600);
 
 		e.draw(g2d);
 		back.draw(g2d);
@@ -87,6 +97,12 @@ public class HelpScreen implements GameScreen {
 				Globals.SCREEN_WIDTH - 300, 20, 1f);
 		LoadingScreen.getInstance().setPercent(75);
 		back.setActiveImage(2);
+	}
+
+	@Override
+	public void refreshSize() {
+		if(back==null) return;
+		back.setX(Globals.SCREEN_WIDTH - 300);
 	}
 
 }

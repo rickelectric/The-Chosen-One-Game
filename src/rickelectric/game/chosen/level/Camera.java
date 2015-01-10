@@ -47,18 +47,18 @@ public class Camera {
 	/**
 	 * update camera
 	 */
-	public void updateCamera() {
+	public void updateCamera(boolean bgUpdate) {
 		float oldTranslateX = this.translateX;
 
 		if (entity != null) {
 			float translateX = -(entity.getX() + entity.getWidth() / 2 - GameSystem
 					.getInstance().getScreenWidth() / 2);
-			if ((-translateX >= 0 && -translateX + Globals.SCREEN_WIDTH
-					/ GameSystem.getInstance().getLevelScreen().getScaler() < Globals.WORLD_WIDTH))
+			if (-translateX >= 0 && -translateX + Globals.SCREEN_WIDTH
+					/ GameSystem.getInstance().getLevelScreen().getScaler() <= Globals.WORLD_WIDTH)
 				this.translateX = translateX;
-			if (entity.getBoundingRect().x < -translateX) {
-				this.translateX = 0;
-			}
+//			if (entity.getBoundingRect().x < -translateX) {
+//				this.translateX = 0;
+//			}
 			float translateY = -(entity.getY() + entity.getHeight() / 2 - GameSystem
 					.getInstance().getScreenHeight() / 2);
 			if (-translateY >= 0
@@ -74,9 +74,11 @@ public class Camera {
 		this.cameraX = -translateX;
 		this.cameraY = -translateY;
 
-		GameSystem.getInstance().getLevelScreen().getBackground()
-				.setSpeed(-(translateX - oldTranslateX));
-		GameSystem.getInstance().getLevelScreen().getBackground().update();
+		if (bgUpdate) {
+			GameSystem.getInstance().getLevelScreen().getBackground()
+					.setSpeed(-(translateX - oldTranslateX));
+			GameSystem.getInstance().getLevelScreen().getBackground().update();
+		}
 	}
 
 	/**

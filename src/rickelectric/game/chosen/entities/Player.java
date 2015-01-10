@@ -13,9 +13,10 @@ import rickelectric.game.chosen.Globals;
 import rickelectric.game.chosen.KeyboardInputService;
 import rickelectric.game.chosen.MyGeometry;
 import rickelectric.game.chosen.RectangleOperations;
-import rickelectric.game.chosen.SoundManager;
+import rickelectric.game.chosen.entities.attacks.Lightning;
 import rickelectric.game.chosen.level.LevelScreen_1;
 import rickelectric.game.chosen.level.tilemap.Tile;
+import rickelectric.game.chosen.sounds.SoundManager;
 
 /**
  * Original
@@ -193,7 +194,7 @@ public class Player extends DualAnimatedSprite {
 						lightning.updateChosenPath();
 					lighTime = System.currentTimeMillis();
 				}
-				lightning.setDirection(activeImage == 1 ? 1 : -1);
+				lightning.setDirection(activeImage == 1 ? Lightning.DIRECTION_RIGHT : Lightning.DIRECTION_LEFT);
 				lightning.update();
 				energy -= 10;
 			}

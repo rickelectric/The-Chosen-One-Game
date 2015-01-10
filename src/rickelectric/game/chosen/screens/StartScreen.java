@@ -105,9 +105,9 @@ public class StartScreen implements GameScreen {
 		LoadingScreen.getInstance().setText("Loading Main Menu...");
 		startScreen = AssetManager.getInstance().getImage("startScreen.jpg");
 		LoadingScreen.getInstance().setPercent(35);
-		imageX = GameSystem.getInstance().getScreenWidth() / 2
+		imageX = Globals.SCREEN_WIDTH / 2
 				- startScreen.getWidth(null) / 2;
-		imageY = GameSystem.getInstance().getScreenHeight() / 2
+		imageY = Globals.SCREEN_HEIGHT / 2
 				- startScreen.getHeight(null) / 2;
 		imageHeight = startScreen.getHeight(null);
 
@@ -126,5 +126,19 @@ public class StartScreen implements GameScreen {
 				imageY + 640, 0.6f);
 		LoadingScreen.getInstance().setPercent(50);
 		setActive(0);
+	}
+
+	public void refreshSize() {
+		if(startScreen==null) return;
+		imageX = Globals.SCREEN_WIDTH / 2
+				- startScreen.getWidth(null) / 2;
+		imageY = Globals.SCREEN_HEIGHT / 2
+				- startScreen.getHeight(null) / 2;
+		
+		for (int i = 0; i < buttons.length; i++) {
+			DualSprite ds = buttons[i];
+			ds.setX(imageX+80);
+			ds.setY(400+(i*80));
+		}
 	}
 }

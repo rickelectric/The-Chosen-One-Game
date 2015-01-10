@@ -3,10 +3,12 @@ package rickelectric.game.chosen.screens;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
 
 import rickelectric.game.chosen.AssetManager;
 import rickelectric.game.chosen.GameSystem;
 import rickelectric.game.chosen.Globals;
+import rickelectric.game.chosen.KeyboardInputService;
 
 public class LoadingScreen implements GameScreen {
 
@@ -38,6 +40,22 @@ public class LoadingScreen implements GameScreen {
 	public void draw(Graphics2D g2d) {
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, Globals.SCREEN_WIDTH, Globals.SCREEN_HEIGHT);
+
+		Image rn = AssetManager.getInstance().getImage("RickNew.png");
+		g2d.drawImage(rn, 0, 10, null);
+
+		int sz = 180;
+		String branding = "Rickelectric Games";
+		do {
+			g2d.setFont(AssetManager.getInstance().getFont()
+					.deriveFont(Font.BOLD | Font.ITALIC, sz));
+			sz--;
+		} while (g2d.getFontMetrics().stringWidth(branding)
+				+ (rn.getWidth(null)) >= Globals.SCREEN_WIDTH);
+
+		g2d.setColor(Color.yellow);
+		g2d.drawString(branding, rn.getWidth(null), rn.getHeight(null) - 90);
+
 		g2d.setFont(AssetManager.getInstance().getFont()
 				.deriveFont(Font.BOLD, 28));
 
@@ -61,6 +79,9 @@ public class LoadingScreen implements GameScreen {
 	}
 
 	public void update() {
+		if (KeyboardInputService.getInstance().isEscape()) {
+			System.exit(0);
+		}
 		if (loadingPercent >= 100) {
 			GameSystem.getInstance().changeScreen(returnScreen);
 		}
@@ -72,6 +93,11 @@ public class LoadingScreen implements GameScreen {
 
 	public void setText(String text) {
 		this.loadingText = text;
+	}
+
+	@Override
+	public void refreshSize() {
+		
 	}
 
 }
